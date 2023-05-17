@@ -1,0 +1,30 @@
+			SVG
+		Twitch
+	Manual
+Module
+[X] [X] [ ] [ ] Music Box
+[X] [!] [X] [ ] Timer
+[/] [/] [ ] [ ] Safe
+[X] [X] [ ] [ ] Maze
+[X] [!] [ ] [ ] Lockpick
+[/] [X] [ ] [ ] Key
+	[!]		[ ] Appendix
+
+X - Completed (Could need a reword)
+/ - In Progress
+! - Needs Rework
+
+---Known Issues---
+Safe has no solution method, simply showing the correct code
+
+Wind the Key uses a scuffed system to determine the target time, needs a minimum module cap, and the fake light still doesn't switch to the solve light's model in game
+
+Lockpick's manual looks bad
+
+Maze is a little complicated and maybe not worded super well.
+
+Music Box's music is WAY too loud and a skip button needs to be added so the defuser doesn't have to wait to submit the code
+
+The only module with TP support is timer
+
+None of the SVGs are done. The appendix also needs a rewrite
