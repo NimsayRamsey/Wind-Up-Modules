@@ -94,8 +94,9 @@ public class WindUpSafe : MonoBehaviour {
 			solution[i] = UnityEngine.Random.Range(0, 12);
 		}
 		tempCombo.text = solution[0] + "-" + solution[1] + "-" + solution[2];
+		Debug.LogFormat("[Wind-Up Safe #{0}] Note reads {1}-{2}-{3}", moduleId, solution[0], solution[1], solution[2]);
 		SolutionCipher();
-		Debug.LogFormat("[Wind-Up Safe #{0}] Combination is {1}-{2}-{3}", moduleId, solution[0], solution[1], solution[2]);
+		Debug.LogFormat("[Wind-Up Safe #{0}] Final Combination is {1}-{2}-{3}", moduleId, solution[0], solution[1], solution[2]);
 		//Debug.LogFormat("[Wind-Up Lockpick #{0}] Solution is {1}-{2}-{3}", moduleId, solution[0]+1, solution[1]+1, solution[2]+1);
 	}
 
@@ -135,22 +136,23 @@ public class WindUpSafe : MonoBehaviour {
 				if (cacheCacheBool[i, 2]) { solveCache[i] += 2; }
 				if (cacheCacheBool[i, 3]) { solveCache[i] += 1; }
 			}
-
-			SetSolution();
+			SetSolution("DVI");
 		}
 		if (PortCache.Contains("Parallel")) {
 			for (int i = 0; i < 3; i++) { solveCache[i] = solveCache[i] + Bomb.GetBatteryCount(); }
-			SetSolution();
+			SetSolution("Parallel");
 		}
 		if (PortCache.Contains("PS2")) {
 			solveCache[0] = solveCache[0] + solution[1] - solution[2];
 			solveCache[1] = solveCache[1] + solution[2] - solution[0];
 			solveCache[2] = solveCache[2] + solution[0] - solution[1];
-			SetSolution();
+			SetSolution("PS2");
 		}
 		if (PortCache.Contains("RJ45")) {
-			
-			SetSolution();
+			/*
+				Uses a small grid. Unsure how it will be set up. Might use number of strikes
+			*/
+			SetSolution("RJ45");
 		}
 		if (PortCache.Contains("Serial")) {
 			int chunk = Bomb.GetPortCount();
@@ -164,22 +166,22 @@ public class WindUpSafe : MonoBehaviour {
 				}
 				
 			}
-			SetSolution();
+			SetSolution("Serial");
 		}
 		if (PortCache.Contains("StereoRCA")) {
-			
-			SetSolution();
-		}
-		for (int i = 0; i < 3; i++) {
-			
+			/*
+				Module will use 3rd and 6th serial number for something. Not sure what
+			*/
+			SetSolution("StereoRCA");
 		}
 	}
 
-	void SetSolution () {
+	void SetSolution (string cipher) {
 		for (int i = 0; i < 3; i++) {
 			if (solveCache[i] < 0) { solveCache[i] = 12+solveCache[i]; } else if (solveCache[i] > 11) { solveCache[i] = solveCache[i]-12; }
 			solution[i] = solveCache[i];
 		}
+		Debug.LogFormat("[Wind-Up Safe #{0}] {1} port found // New combination is {2}-{3}-{4}", moduleId, cipher, solution[0], solution[1], solution[2]);
 	}
 
 	void PlaceKey () {
@@ -191,7 +193,7 @@ public class WindUpSafe : MonoBehaviour {
 			Audio.PlaySoundAtTransform("Key_In", transform);
 			TurnArrowsTransform[0].SetActive(true);
 			TurnArrowsTransform[1].SetActive(true);
-			lightMesh[0].material = lightMats[1];
+			if (modulePassed) { lightMesh[1].material = lightMats[3]; } else { lightMesh[0].material = lightMats[1]; }
 		} else if (HasKey) {
 			MasterKey.GlobalKeyHeld = true;
 			HasKey = false;
@@ -228,7 +230,7 @@ public class WindUpSafe : MonoBehaviour {
 		turnFrame = 3;
 		Audio.PlaySoundAtTransform("metal_hit_05", transform);
 		//Debug.Log(dialVal);
-
+		if (modulePassed) { return; }
 		if(direction != currentDirection && !startCombo) { currentStep = 2; } else { startCombo = true; }
 
 		if (direction != currentDirection && currentStep != 3) { currentStep += 1; currentDirection = direction; if (currentStep != 3) { Debug.LogFormat("[Wind-Up Safe #{0}] Step {1} stored as {2}", moduleId, currentStep, bugSTORE); } }
@@ -250,16 +252,12 @@ public class WindUpSafe : MonoBehaviour {
 		}
 	}
 
-	bool conditionCheck (int condition) {
-		
-		return false;
-	}
-
 	void CheckSolve () {
+		if (modulePassed) { return; }
 		discard = false;
 		startCombo = false;
-		if (currentStep == 2) { Debug.LogFormat("[Wind-Up Safe #{0}] Step 3 stored as {1}", moduleId, dialVal); } else if (currentStep != 3 && !(currentStep == 0 && dialVal == 0)) { Debug.LogFormat("[Wind-Up Safe #{0}] Combination discarded", moduleId); }
-		if (currentStep == 2 && submit[0] == solution[0] && submit[1] == solution[1] && submit[2] == solution[2]) { Debug.LogFormat("[Wind-Up Safe #{0}] Combination accepted", moduleId); Module.HandlePass(); modulePassed = true; } else if (currentStep == 2 && !modulePassed) { Debug.LogFormat("[Wind-Up Safe #{0}] Combination incorrect", moduleId); Module.HandleStrike(); }
+		if (currentStep == 2) { Debug.LogFormat("[Wind-Up Safe #{0}] Step 3 stored as {1}", moduleId, dialVal); } else if (currentStep != 3 && currentStep != 0) { Debug.LogFormat("[Wind-Up Safe #{0}] Combination discarded", moduleId); }
+		if (currentStep == 2 && submit[0] == solution[0] && submit[1] == solution[1] && submit[2] == solution[2]) { Debug.LogFormat("[Wind-Up Safe #{0}] Combination accepted", moduleId); Module.HandlePass(); modulePassed = true; } else if (currentStep == 2) { Debug.LogFormat("[Wind-Up Safe #{0}] Combination incorrect", moduleId); Module.HandleStrike(); }
 	}
 	
 	void Update () {

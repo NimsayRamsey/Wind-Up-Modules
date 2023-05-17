@@ -1,11 +1,7 @@
-Community fork of the KTaNE Modkit.
+This is a collection of modules that share an important part between them, even across bombs. Build files and manuals are in releases for now. Once the pack is released on steam, this will be updated to direct you there instead
 
-The [original (official) modkit](https://github.com/keeptalkinggame/ktanemodkit) isn't going to receive updates anymore. This is the fork that will be maintained from now on.
+Feedback should be left in the Wind-Up Modules Beta Thread in #mod-creation in the unnoficial KTANE server: https://discord.gg/K6uQMyBcYZ
 
-Community-made plugins can be installed at the `Keep Talking ModKit > Plugins` menupoint.
+Link to the github: https://github.com/NimsayRamsey/Wind-Up-Modules
 
-[Documentation](https://github.com/Qkrisi/ktanemodkit/wiki)
-
-To get more help, join the [Keep Talking and Nobody Explodes](https://discord.gg/ktane) or the [KTaNE Modding](https://discord.gg/qzy7Gdz) Discord servers.
-
-Nimsay's Notes: The build folder contains a zip for both the built mod and html manuals, in case you do not wish to download the entire repository
+Thank you for checking this project out :D
