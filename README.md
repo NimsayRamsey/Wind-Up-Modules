@@ -7,3 +7,5 @@ Community-made plugins can be installed at the `Keep Talking ModKit > Plugins` m
 [Documentation](https://github.com/Qkrisi/ktanemodkit/wiki)
 
 To get more help, join the [Keep Talking and Nobody Explodes](https://discord.gg/ktane) or the [KTaNE Modding](https://discord.gg/qzy7Gdz) Discord servers.
+
+Nimsay's Notes: The build folder contains a zip for both the built mod and html manuals, in case you do not wish to download the entire repository
