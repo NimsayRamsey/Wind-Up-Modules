@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1">
+    <title>Wind-Up Safe — Keep Talking and Nobody Explodes Module</title>
+    <link rel="stylesheet" type="text/css" href="css/font.css">
+    <link rel="stylesheet" type="text/css" href="css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script src="js/ktane-utils.js"></script>
+    <style>
+        .dark table, table {
+            margin: 1em auto;
+            border: none;
+            text-align: center;
+        }
+        
+        .musicBox {
+            margin-top: 1em;
+            border: none;
+        }
+        .musicBox td:nth-child(3) {
+            border-left: .7mm solid;
+        }
+    
+
+        svg { width: 100%; }
+        .full-width { width: 100%; }
+        .dark svg tspan.inv { fill: #DDD; }
+        
+        .page-footer::before { content: 'Page '; }
+        .page-footer::after { content: ' of 1'; }
+    </style>
+</head>
+<body>
+    <div class="section">
+        <div class="page page-bg-01">
+            <div class="page-header">
+                <span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
+                <span class="page-header-section-title">Wind-Up Safe</span>
+            </div>
+            <div class="page-content">
+                <img src="img/Component/Wind-Up Timer.svg" class="diagram">
+                <h2>On the Subject of Wind-Up Safe</h2>
+                <p class="flavour-text">Sponsored by AXE Body Spray</p>
+                <p class="centered"><b><u><i>/!\ IMPORTANT /!\<br>This is a module in the Wind-Up series. Refer to Appendix WIND-UP KEY for important notes.</i></u></b></p>
+                <p>The module contains a large, 12-sectioned combination safe with a keyhole in the center. Using the key, input a 3 part combination to disarm the module.</p>
+                <p><u>RULES:</u><ul>
+                    <li>The order of submission goes counter, clockwise, counter.</li>
+                    <li>The dials are tracked as 0-11, going clockwise.</li>
+                    <li>The code is 3 numbers. Turn to the first number, then second, then remove the key while the dial is set to the third.</li>
+                    <li>The red LED will turn on while the combination is being tracked. The green LED will turn on during the third rotation.</li>
+                    <li>Remove the key while the green LED is on to submit the combination.</li>
+                    <li>If the green LED is off, the module will reset without striking.</li>
+                    <li>Inputting more than 3 numbers or going clockwise first will stop tracking your combination and turn the LEDs off.</li>
+                </ul></p>
+                <p><b>HANDICAPPED:</b> The correct code is displayed on the tape above the dial.</p>
+            </div>
+            <div class="page-footer relative-footer">1</div>
+        </div>
+
+        <div class="page page-bg-01">
+            <div class="page-header">
+                <span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
+                <span class="page-header-section-title">Dev Notes</span>
+            </div>
+            <div class="page-content">
+                <h2>CONCEPT SOLVE METHOD</h2>
+                <p>The code on the tape will be modified multiple times depending on what ports are located on the bomb.</p>
+                <p>The conversions must go down the list in order and only done if the <u>TYPE</u> of port is on the module.</p>
+                <p>If there's no ports, the owner is dumb as rocks. Code stays the same.</p>
+                <ul>
+                    <li><u>IMPORTANT: any calculations past 0/11 will loop</u></li>
+                    <li><b>DVI-D</b> - XOR
+                        <ul>
+                            <li>Convert each decimal number to binary, adding 0s leftside if shorter than 4 bits:</li>
+                            <li>XOR step 1 & step 2</li>
+                            <li>XOR step 2 & step 3</li>
+                            <li>XOR step 3 & step 1</li>
+                            <li>IMPORTANT: Numbers higher than 11 will loop around to 0</li>
+                            <li>Convert back to decimal</li>
+                            <li>EXAMPLE: 9-6-5 --&gt 3-3-1</li>
+                        </ul>
+                    </li>
+                    <li><b>Parallel</b> - Shift
+                        <ul>
+                            <li>Add the number of batteries to each step</li>
+                            <li>EXAMPLE: SN3[6] [9-6-5] --&gt 3-0-11</li>
+                        </ul>
+                    </li>
+                    <li><b>PS/2</b> - Wheel
+                        <ul>
+                            <li>The correct code is as follows:</li>
+                            <li>A - step 1 + step 2 - step 3</li>
+                            <li>B - step 2 + step 3 - step 1</li>
+                            <li>C - step 3 + step 1 - step 2</li>
+                            <li>EXAMPLE: 9-6-5 --&gt 10-2-8</li>
+                        </ul>
+                    </li>
+                    <li><b>RJ-45</b> - Grid - <b><u>MISSING</u></b>
+                        <ul>
+                            <li></li>
+                        </ul>
+                    </li>
+                    <li><b>Serial</b> - M-Shift
+                        <ul>
+                            <li>Shift, but the numbers shift backwards, use the number of ports, and are in 4 number chunks</li>
+                            <li>If they reach the edge of their chunk, they'll reverse direction</li>
+                            <li>EXAMPLE: SN6[9] [2] --&gt 1-0-11-0-1-2-1-0-11 --&gt 11</li>
+                        </ul>
+                    </li>
+                    <li><b>Stereo RCA</b> - Doubles - <b><u>INCOMPLETE</u></b>
+                        <ul>
+                            <li>Grab the 3rd and 6th digits in the serial number. These will be M1 and M2.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="page-footer relative-footer">1</div>
+        </div>
+    </div>
+</body>
+</html>

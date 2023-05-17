@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1">
+    <title>Wind-Up Key — Keep Talking and Nobody Explodes Module</title>
+    <link rel="stylesheet" type="text/css" href="css/font.css">
+    <link rel="stylesheet" type="text/css" href="css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script src="js/ktane-utils.js"></script>
+    <style>
+        .dark table, table {
+            margin: 1em auto;
+            border: none;
+            text-align: center;
+        }
+        
+        .musicBox {
+            margin-top: 1em;
+            border: none;
+        }
+        .musicBox td:nth-child(3) {
+            border-left: .7mm solid;
+        }
+    
+
+        svg { width: 100%; }
+        .full-width { width: 100%; }
+        .dark svg tspan.inv { fill: #DDD; }
+        
+        .page-footer::before { content: 'Page '; }
+        .page-footer::after { content: ' of 1'; }
+    </style>
+</head>
+<body>
+    <div class="section">
+        <div class="page page-bg-01">
+            <div class="page-header">
+                <span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
+                <span class="page-header-section-title">Wind-Up Key</span>
+            </div>
+            <div class="page-content">
+                <img src="img/Component/Wind-Up Timer.svg" class="diagram">
+                <h2>On the Subject of Wind The Key</h2>
+                <p class="flavour-text"></p>
+                <p class="centered"><b><u><i>/!\ IMPORTANT /!\<br>This is a module in the Wind-Up series. Refer to Appendix WIND-UP KEY for important notes.</i></u></b></p>
+                <p>The module is disguised as a needy and contains 2 LEDs, a keyhole, and a segment display at the top. The module has 2 phases</p>
+                <p><u><b>PHASE 1*</b></u><br>The display will show the number of module solves** needed to activate phase 2. Each solve ticks this number down by 1.<br>When the count reaches 0, phase 2 will start and an alarm will sound.<br>Turning the key will not strike during this phase.</p>
+                <p><u><b>PHASE 2</b></u><br>The lower right light will start to flash and the display will change to a time. You must turn the key at the time exactly, or the bomb will immediatly explode. Turning too early will simply strike.</p>
+                <p><b><u>If no other modules remain, the light will stay on. At this point, You can turn the key to disarm the module at any time.</u></b></p>
+                <p><i>*If this is the only module on the case, the module will skip straight to phase 2<br>**Ignored modules will not count towards the countdown</i></p>
+            </div>
+            <div class="page-footer relative-footer">1</div>
+        </div>
+    </div>
+</body>
+</html>

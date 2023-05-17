@@ -1,0 +1,179 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1">
+    <title>Wind-Up Music Box — Keep Talking and Nobody Explodes Module</title>
+    <link rel="stylesheet" type="text/css" href="css/font.css">
+    <link rel="stylesheet" type="text/css" href="css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script src="js/ktane-utils.js"></script>
+    <style>
+        .dark table, table {
+            margin: 1em auto;
+            border: none;
+            text-align: center;
+        }
+        
+        .musicBox {
+            margin-top: 1em;
+            border: none;
+        }
+        .musicBox td:nth-child(3) {
+            border-left: .7mm solid;
+        }
+    
+
+        svg { width: 100%; }
+        .full-width { width: 100%; }
+        .dark svg tspan.inv { fill: #DDD; }
+        
+        .page-footer::before { content: 'Page '; }
+        .page-footer::after { content: ' of 1'; }
+    </style>
+</head>
+<body>
+    <div class="section">
+        <div class="page page-bg-01">
+            <div class="page-header">
+                <span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
+                <span class="page-header-section-title">Wind-Up Music Box</span>
+            </div>
+            <div class="page-content">
+                <img src="img/Component/Wind-Up Timer.svg" class="diagram">
+                <h2>On the Subject of Wind-Up Music Box</h2>
+                <p class="flavour-text"></p>
+                <p class="centered"><b><u><i>/!\ IMPORTANT /!\<br>This is a module in the Wind-Up series. Refer to Appendix WIND-UP KEY for important notes.</i></u></b></p>
+                <p>The module holds a single key hole in the top left and 4 music buttons on the bottom.</p>
+                <p>The music box must be wound fully before it can start playing, and the code can only be entered while it's not playing.</p>
+
+                <table class="musicBox borderless">
+                    <tr>
+                        <td>My Heart Will Go On</td>
+                        <td>♬ ♬ ♫ ♪</td>
+                        <td>Beyond The Sea</td>
+                        <td>♫ ♪ ♩ ♬</td>
+                    </tr>
+                    <tr>
+                        <td>Over The Rainbow*</td>
+                        <td>♩ ♬ ♫ ♩</td>
+                        <td>Puff the Magic Dragon**</td>
+                        <td>♬ ♬ ♪ ♫</td>
+                    </tr>
+                    <tr>
+                        <td>Let It Snow*</td>
+                        <td>♬ ♫ ♫ ♪</td>
+                        <td>Here Comes Santa Claus*</td>
+                        <td>♩ ♬ ♫ ♪</td>
+                    </tr>
+                    <tr>
+                        <td>It's a Small World</td>
+                        <td>♬ ♫ ♪ ♪</td>
+                        <td>Mickey Mouse Club House March</td>
+                        <td>♩ ♪ ♫ ♫</td>
+                    </tr>
+                    <tr>
+                        <td>Hidden Palace</td>
+                        <td>♪ ♫ ♪ ♬</td>
+                        <td>Never Gonna Give You Up</td>
+                        <td>♪ ♫ ♬ ♫</td>
+                    </tr>
+                    <tr>
+                        <td>Mice On Venus</td>
+                        <td>♬ ♪ ♩ ♫</td>
+                        <td>Living Mice</td>
+                        <td>♩ ♪ ♬ ♫</td>
+                    </tr>
+                    <tr>
+                        <td>Rock a Bye Baby</td>
+                        <td>♩ ♫ ♪ ♬</td>
+                        <td>Clair de lune</td>
+                        <td>♩ ♪ ♫ ♪</td>
+                    </tr>
+                    <tr>
+                        <td>His Theme</td>
+                        <td>♪ ♫ ♪ ♩</td>
+                        <td>Merry-Go-Round of Life</td>
+                        <td>♫ ♪ ♬ ♫</td>
+                    </tr>
+                    <tr>
+                        <td>Isabella's Lullaby</td>
+                        <td>♪ ♪ ♩ ♫</td>
+                        <td>You Are My Sunshine</td>
+                        <td>♩ ♪ ♬ ♬</td>
+                    </tr>
+                    <tr>
+                        <td>Fur Elise*</td>
+                        <td>♬ ♬ ♬ ♫</td>
+                        <td>The Book of Boba Fett</td>
+                        <td>♫ ♪ ♫ ♫</td>
+                    </tr>
+                    <tr>
+                        <td>Waltz of Chihiro</td>
+                        <td>♫ ♪ ♩ ♫</td>
+                        <td>Christmas Time is Here</td>
+                        <td>♫ ♩ ♪ ♩</td>
+                    </tr>
+                    <tr>
+                        <td>Song of Storms</td>
+                        <td>♬ ♫ ♬ ♫</td>
+                        <td>Ballad of the Wind Fish</td>
+                        <td>♩ ♬ ♫ ♬</td>
+                    </tr>
+                    <tr>
+                        <td>Toreador Song</td>
+                        <td>♬ ♪ ♫ ♩</td>
+                        <td>The Great Fairy Fountain</td>
+                        <td>♬ ♫ ♪ ♩</td>
+                    </tr>
+                    <tr>
+                        <td>Dearly Beloved</td>
+                        <td>♬ ♪ ♫ ♪</td>
+                        <td>Hall of the Mountain King</td>
+                        <td>♫ ♪ ♫ ♪</td>
+                    </tr>
+                    <tr>
+                        <td>Luma</td>
+                        <td>♩ ♪ ♫ ♬</td>
+                        <td>Bluebird of Misfortune</td>
+                        <td>♩ ♬ ♪ ♫</td>
+                    </tr>
+                    <tr>
+                        <td>Rush E</td>
+                        <td>♪ ♫ ♩ ♫</td>
+                        <td>Salut d’Amour</td>
+                        <td>♫ ♫ ♪ ♩</td>
+                    </tr>
+                    <tr>
+                        <td>Kirby!</td>
+                        <td>♪ ♩ ♩ ♪</td>
+                        <td>Memories Returned</td>
+                        <td>♩ ♪ ♩ ♫</td>
+                    </tr>
+                    <tr>
+                        <td>Toad House</td>
+                        <td>♫ ♫ ♪ ♫</td>
+                        <td>The Rampage of Hatsune Miku</td>
+                        <td>♩ ♩ ♬ ♫</td>
+                    </tr>
+                    <tr>
+                        <td>File Select</td>
+                        <td>♫ ♬ ♬ ♪</td>
+                        <td>Two Birds</td>
+                        <td>♪ ♪ ♬ ♫</td>
+                    </tr>
+                    <tr>
+                        <td>Swan Lake</td>
+                        <td>♬ ♫ ♬ ♬</td>
+                        <td>Rainbow Connection</td>
+                        <td>♫ ♪ ♫ ♬</td>
+                    </tr>
+                </table>
+
+                <p>All music box tunes can be found <a href="https://themusicboxcompany.com/tune-list">here</a></p>
+            </div>
+            <div class="page-footer relative-footer">1</div>
+        </div>
+    </div>
+</body>
+</html>

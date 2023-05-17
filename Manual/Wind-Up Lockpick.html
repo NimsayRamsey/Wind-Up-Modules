@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1">
+    <title>Wind-Up Lockpick — Keep Talking and Nobody Explodes Module</title>
+    <link rel="stylesheet" type="text/css" href="css/font.css">
+    <link rel="stylesheet" type="text/css" href="css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script src="js/ktane-utils.js"></script>
+    <style>
+        .dark table, table {
+            margin: 1em auto;
+            border: none;
+            text-align: center;
+        }
+        
+        .musicBox {
+            margin-top: 1em;
+            border: none;
+        }
+        .musicBox td:nth-child(3) {
+            border-left: .7mm solid;
+        }
+    
+
+        svg { width: 100%; }
+        .full-width { width: 100%; }
+        .dark svg tspan.inv { fill: #DDD; }
+        
+        .page-footer::before { content: 'Page '; }
+        .page-footer::after { content: ' of 1'; }
+    </style>
+</head>
+<body>
+    <div class="section">
+        <div class="page page-bg-01">
+            <div class="page-header">
+                <span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
+                <span class="page-header-section-title">Wind-Up Lockpick</span>
+            </div>
+            <div class="page-content">
+                <img src="img/Component/Wind-Up Timer.svg" class="diagram">
+                <h2>On the Subject of Wind-Up Lockpick</h2>
+                <p class="flavour-text">Rusty Dusty Four-hole Trouble</p>
+                <p class="centered"><b><u><i>/!\ IMPORTANT /!\<br>This is a module in the Wind-Up series. Refer to Appendix WIND-UP KEY for important notes.</i></u></b></p>
+                <p>The module holds 4 key holes. Three in a row above the fourth.</p>
+                <ul>
+                    <li>The top 3 holes can be turned between 4 positions. The bottom hole can be turned to submit the current combo.</li>
+                    <li>Each hole, as well as the washer around the submit hole, can have 1 of 3 materials, each with a value:
+                    <ul>
+                        <li>Copper - 1</li>
+                        <li>Brass - 2</li>
+                        <li>Steel - 3</li>
+                    </ul></li>
+                </ul>
+                <p>Follow these rules in the order they are listed. Perform the first action that applies. Any values below 1 or above 4 loop back around:</p>
+                <ol>
+                    <li>All 3 turn slots are the same color<ul>
+                        <li>IF Solve Peg is the same material as the Solve Washer<ul>
+                            <li>Right turn slot should be set to its own material, then subtract one going left</li>
+                        </ul></li>
+                        <li>Else<ul>
+                            <li>Invert the values (copper = 4). Left turn slot should then be set to it's own material, then add one going right</li>
+                        </ul></li>
+                    </ul></li>
+                    <li>There's more copper parts than brass or steel<ul>
+                        <li>Set each copper slot to the submit washer + the submit peg. All other slots should be their material plus their position</li>
+                    </ul></li>
+                    <li>There's only 2 materials used<ul>
+                        <li>Copper - Number of batteries mod 4 + 1</li>
+                        <li>Brass - 3rd + 6th serial number mod 4 +1</li>
+                        <li>Steel - Number of ports mod 4 + 1</li>
+                    </ul></li>
+                    <li>All 3 slots are different materials<ul>
+                        <li>Copper slot should add its position</li>
+                        <li>Brass slot is slot 1 plus slot 3</li>
+                        <li>Steel slot is itself plus submit washer</li>
+                    </ul></li>
+                    <li>If none of the above apply, Take the value of each turn slot and add the submit washer</li>
+                </ol>
+            </div>
+            <div class="page-footer relative-footer">1</div>
+        </div>
+    </div>
+</body>
+</html>

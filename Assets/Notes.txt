@@ -3,12 +3,12 @@
 	Manual
 Module
 [X] [X] [ ] [ ] Music Box
-[X] [!] [X] [ ] Timer
+[X] [X] [X] [ ] Timer
 [/] [/] [ ] [ ] Safe
 [X] [X] [ ] [ ] Maze
-[X] [!] [ ] [ ] Lockpick
+[X] [/] [ ] [ ] Lockpick
 [/] [X] [ ] [ ] Key
-	[!]		[ ] Appendix
+	[X]		[ ] Appendix
 
 X - Completed (Could need a reword)
 / - In Progress
