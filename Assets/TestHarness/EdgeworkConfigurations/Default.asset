@@ -13,4 +13,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SerialNumberType: 0
   CustomSerialNumber: 
+  TwoFactorResetTime: 30
   Widgets: []

@@ -41,6 +41,10 @@ public class WindUpSafe : MonoBehaviour {
 	private bool startCombo = false;
 	private bool discard = false;
 
+	
+	int[] solveCache = new int[] {0, 0, 0};
+	private List<string> PortCache = new List<string> {};
+
 	//-----------------------------------------------------//
 	//SHARED INFORMATION
 	private bool HasKey = false;
@@ -84,12 +88,98 @@ public class WindUpSafe : MonoBehaviour {
 	}
 
 	void InitSolution () {
+		PortCache = Bomb.GetPorts().ToList();
+
 		for (int i = 0; i < 3; i++) {
 			solution[i] = UnityEngine.Random.Range(0, 12);
 		}
 		tempCombo.text = solution[0] + "-" + solution[1] + "-" + solution[2];
+		SolutionCipher();
 		Debug.LogFormat("[Wind-Up Safe #{0}] Combination is {1}-{2}-{3}", moduleId, solution[0], solution[1], solution[2]);
 		//Debug.LogFormat("[Wind-Up Lockpick #{0}] Solution is {1}-{2}-{3}", moduleId, solution[0]+1, solution[1]+1, solution[2]+1);
+	}
+
+	void SolutionCipher () {
+		/*	[X] DVI ------- XOR
+			[X] Parallel -- Shift
+			[X] PS2 ------- Wheel
+			[ ] RJ45 ------ Grid
+			[X] Serial ---- M-Shift
+			[ ] StereoRCA - Doubles
+		*/	
+		for (int i = 0; i < 3; i++) { solveCache[i] = solution[i]; }
+		if (PortCache.Contains("DVI")) {
+			bool[,] decimalToBinary = new bool[,] {
+				{false, false, false, false}, {false, false, false, true}, {false, false, true, false}, {false, false, true, true}, //0-1-2-3
+				{false, true, false, false}, {false, true, false, true}, {false, true, true, false}, {false, true, true, true},     //4-5-6-7
+				{true, false, false, false}, {true, false, false, true}, {true, false, true, false}, {true, false, true, true},     //8-9-10-11
+				{true, true, false, false}, {true, true, false, true}, {true, true, true, false}, {true, true, true, true},         //12-13-14-15
+			};
+			bool[,] solveCacheBool = new bool[,] { {false, false, false, false}, {false, false, false, false}, {false, false, false, false} };
+			bool[,] cacheCacheBool = new bool[,] { {false, false, false, false}, {false, false, false, false}, {false, false, false, false} };
+
+			for (int i = 0; i < 3; i++) {
+				for (int j = 0; j < 4; j++) {
+					solveCacheBool[i, j] = decimalToBinary[solveCache[i], j];
+				}
+			}
+			for (int i = 0; i < 4; i++) {
+				if (solveCacheBool[0, i] != solveCacheBool[1, i]) { cacheCacheBool[0, i] = true; } else { cacheCacheBool[0, i] = false; }
+				if (solveCacheBool[1, i] != solveCacheBool[2, i]) { cacheCacheBool[1, i] = true; } else { cacheCacheBool[1, i] = false; }
+				if (solveCacheBool[2, i] != solveCacheBool[0, i]) { cacheCacheBool[2, i] = true; } else { cacheCacheBool[2, i] = false; }
+			}
+			for (int i = 0; i < 3; i++) {
+				solveCache[i] = 0;
+				if (cacheCacheBool[i, 0]) { solveCache[i] += 8; }
+				if (cacheCacheBool[i, 1]) { solveCache[i] += 4; }
+				if (cacheCacheBool[i, 2]) { solveCache[i] += 2; }
+				if (cacheCacheBool[i, 3]) { solveCache[i] += 1; }
+			}
+
+			SetSolution();
+		}
+		if (PortCache.Contains("Parallel")) {
+			for (int i = 0; i < 3; i++) { solveCache[i] = solveCache[i] + Bomb.GetBatteryCount(); }
+			SetSolution();
+		}
+		if (PortCache.Contains("PS2")) {
+			solveCache[0] = solveCache[0] + solution[1] - solution[2];
+			solveCache[1] = solveCache[1] + solution[2] - solution[0];
+			solveCache[2] = solveCache[2] + solution[0] - solution[1];
+			SetSolution();
+		}
+		if (PortCache.Contains("RJ45")) {
+			
+			SetSolution();
+		}
+		if (PortCache.Contains("Serial")) {
+			int chunk = Bomb.GetPortCount();
+			//while (chunk > 3) { chunk = chunk - 4; }
+			for (int i = 0; i < 3; i++) {
+				int dir = -1;
+				for (int j = 0; j < chunk; j++) {
+					solveCache[i] = solveCache[i] + (1*dir);
+					if (solveCache[i] < solution[i] - 3) { solveCache[i] = solveCache[i] + 2; dir = 1; }
+					if (solveCache[i] > solution[i]) { solveCache[i] = solveCache[i] - 2; dir = -1; }
+				}
+				
+			}
+			SetSolution();
+		}
+		if (PortCache.Contains("StereoRCA")) {
+			
+			SetSolution();
+		}
+		for (int i = 0; i < 3; i++) {
+			
+		}
+	}
+
+	void SetSolution () {
+		for (int i = 0; i < 3; i++) {
+			if (solveCache[i] < 0) { solveCache[i] = 12+solveCache[i]; } else if (solveCache[i] > 11) { solveCache[i] = solveCache[i]-12; }
+			solution[i] = solveCache[i];
+		}
 	}
 
 	void PlaceKey () {
