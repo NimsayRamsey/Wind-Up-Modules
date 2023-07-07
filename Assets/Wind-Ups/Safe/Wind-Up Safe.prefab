@@ -2293,6 +2293,7 @@ MonoBehaviour:
   - {fileID: 4656504398018406}
   tempCombo: {fileID: 102284110612103062}
   debugMode: 0
+  debugCode: 02000000010000000a000000
 --- !u!114 &114762579268996582
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2390,8 +2391,11 @@ MonoBehaviour:
   Parent: {fileID: 0}
   Children:
   - {fileID: 114836233892057636}
-  - {fileID: 114205856938792046}
+  - {fileID: 0}
   - {fileID: 114481991464386064}
+  - {fileID: 0}
+  - {fileID: 114205856938792046}
+  - {fileID: 0}
   IsPassThrough: 0
   ChildRowLength: 3
   Highlight: {fileID: 114736421343940346}

@@ -36,7 +36,6 @@ public class WindUpMaze : MonoBehaviour {
 	public int debugMaze;
 
 	//-----------------------------------------------------//
-	private bool moduleSolved = false;
 	private int heldFrame = 0;
 	private bool held = false;
 
@@ -126,7 +125,9 @@ public class WindUpMaze : MonoBehaviour {
 	//SHARED INFORMATION
 	private int HasKey = 0;
 	int windID = 0;
-
+	
+	private bool moduleSolved = false;
+	private bool tpOverride = false;
 	//-----------------------------------------------------//
 	static int moduleIdCounter = 1;
 	int moduleId;
@@ -159,13 +160,22 @@ public class WindUpMaze : MonoBehaviour {
 	void Start () {
 		windID = MasterKey.ServeID(Bomb);
 
-		for (int i = 0; i < 4; i++) { TurnArrowsTransform[i].SetActive(false); }
+		StartCoroutine(GoFuckYourself());
 
 		StartCoroutine(CheckKey());
 
 		InitSolution();
 		Debug.LogFormat("[Wind-Up Maze #{0}] Maze is {1}. Starting at {2}, {3}. Solution is on {4}, {5}", moduleId, mazeNames[chosenMaze], coords[0], coords[1], mainCoords[1, 0], mainCoords[1, 1]);
 		StartCoroutine(Animate());
+	}
+
+	IEnumerator GoFuckYourself() {
+		/*Piece of crap Modkit
+			I literally didn't have to do this for any other wind up module except this one and Simon.
+			All for controller support, which isn't even recommended for these.
+		*/
+		yield return new WaitForSeconds(0.01f);
+		for (int i = 0; i < 4; i++) { TurnArrowsTransform[i].SetActive(false); }
 	}
 
 	IEnumerator CheckKey () {
@@ -215,8 +225,13 @@ public class WindUpMaze : MonoBehaviour {
 				if (hintGrid[j, i] == 0) { hintGrid[j, i] = UnityEngine.Random.Range(0, 2); }
 			}
 		}
+		Debug.LogFormat("[Wind-Up Maze #{0}] Coordinates start at top left going down right. Top right is x3 y0, Bottom left is x0 y3.", moduleId);
 		for (int i = 0; i < 2; i++) {
-			Debug.LogFormat("[Wind-Up Maze #{0}] Mode {1} grid:\n{2} - - {5}\n- {3} {4} -\n- {7} {8} -\n{6} - - {9}", moduleId, i, hintGrid[i, 0], hintGrid[i, 1], hintGrid[i, 2], hintGrid[i, 3], hintGrid[i, 4], hintGrid[i, 5], hintGrid[i, 6], hintGrid[i, 7]);
+			Debug.LogFormat("[Wind-Up Maze #{0}] Mode {1} grid:", moduleId, i);
+			Debug.LogFormat("[Wind-Up Maze #{0}] {1} - - {2}", moduleId, hintGrid[i, 0], hintGrid[i, 1]);
+			Debug.LogFormat("[Wind-Up Maze #{0}] - {1} {2} -", moduleId, hintGrid[i, 2], hintGrid[i, 3]);
+			Debug.LogFormat("[Wind-Up Maze #{0}] - {1} {2} -", moduleId, hintGrid[i, 4], hintGrid[i, 5]);
+			Debug.LogFormat("[Wind-Up Maze #{0}] {1} - - {2}", moduleId, hintGrid[i, 6], hintGrid[i, 7]);
 		}
 	}
 
@@ -234,7 +249,7 @@ public class WindUpMaze : MonoBehaviour {
 				}
 			}
 		}
-		Debug.Log(Ser3rd);//Bomb.GetBatteryCount(1)
+		//Debug.Log(Ser3rd);//Bomb.GetBatteryCount(1)
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 2; j++) {
 				if (hintGrid[j, i] == 1) {
@@ -328,6 +343,7 @@ public class WindUpMaze : MonoBehaviour {
 		if (turnFrame2 != 0) { return; }
 		direction = (arrow % 2)-1;
 		if (direction == 0) { direction = 1; }
+		if ((direction == -1 && hintMode == 0) || (direction == 1 && hintMode == 1)) { return; }
 		//Debug.Log(direction);
 		//Debug.Log(dialVals[HasKey-1]);
 		//if (HasKey == 0 || HasKey == 4) { return; }
@@ -446,10 +462,158 @@ public class WindUpMaze : MonoBehaviour {
 			return;
 		}
 		Debug.LogFormat("[Wind-Up Maze #{0}] Submitted {1}, {2}", moduleId, coords[0], coords[1]);
-		if (coords[0] == mainCoords[1, 0] && coords[1] == mainCoords[1, 1]) { Debug.LogFormat("[Wind-Up Maze #{0}] Correct", moduleId); moduleSolved = true; Module.HandlePass(); } else { coords = new int[] {mainCoords[0, 0], mainCoords[0, 1]}; facing = 0; Debug.LogFormat("[Wind-Up Maze #{0}] Wrong. Striking and resetting to {1}, {2} facing {3}", moduleId, coords[0], coords[1], faceName[facing]); Module.HandleStrike(); }
+		if (coords[0] == mainCoords[1, 0] && coords[1] == mainCoords[1, 1]) {
+			Debug.LogFormat("[Wind-Up Maze #{0}] Correct", moduleId);
+			moduleSolved = true;
+			if (!tpOverride) { Module.HandlePass(); }
+		} else {
+			coords = new int[] {mainCoords[0, 0], mainCoords[0, 1]};
+			facing = 0;
+			Debug.LogFormat("[Wind-Up Maze #{0}] Wrong. Striking and resetting to {1}, {2} facing {3}", moduleId, coords[0], coords[1], faceName[facing]);
+			if (!tpOverride) { Module.HandleStrike(); }
+		}
 	}
 	
-	void Update () {
-		//if (needyActive) {  }
+			// Twitch Plays Support
+
+#pragma warning disable 414
+	private readonly string TwitchHelpMessage = @"!{0} Grab -- Grab key (if applicable) || Check Start/Target -- Checks the light grid for start/target coordinates || Reset -- Resets your position || Move -- Moves you one space forward || Turn Forward/Left/Right -- Turns your position || Submit -- Submits your coords";
+#pragma warning restore 414
+
+	bool isValidPos(string n, int SET) {
+		string[] valids = new string[] {};
+		if (SET == 0) {
+			valids = new string[] { "START", "TARGET" };
+		} else {
+			valids = new string[] {"LEFT", "RIGHT" };
+		}
+		if (!valids.Contains(n)) { return false; }
+		return true;
+	}
+
+	void TwitchToggleKey(int K) {
+		KeyHoles[K].OnInteract();
+		KeyHoles[K].OnInteractEnded();
+	}
+
+	IEnumerator ProcessTwitchCommand (string command) {
+		yield return null;
+
+		string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+		if (split[0].EqualsIgnoreCase("GRAB")) {
+			if (split.Length != 1) {
+				yield return "sendtochaterror Too many words in command!";
+				yield break;
+			} else if (HasKey != 1) {
+				yield return "sendtochaterror Key is located somewhere else or was already grabbed";
+				yield break;
+			}
+			TwitchToggleKey(0);
+			yield break;
+		}
+
+		if (split[0].EqualsIgnoreCase("CHECK")) {
+			string[] valids = new string[] { "START", "TARGET" };
+			if (split.Length != 2) {
+				yield return "sendtochaterror Too many words in command!";
+				yield break;
+			} if (!isValidPos(split[1], 0)) {
+				yield return "sendtochaterror " + split[1] + " is not valid";
+				yield break;
+			} else if (!MasterKey.GlobalKeyHeld && HasKey == 0) {
+				yield return "sendtochaterror Key is located somewhere else";
+				yield break;
+			}
+			int HINT = Array.IndexOf(valids, split[1]);
+			if (HasKey == 1) { TwitchToggleKey(0); }
+			modeKey.OnInteract();
+			Debug.Log(HINT);
+			if (hintMode != HINT) { TurnArrows2[HINT].OnInteract(); }
+			yield return new WaitForSeconds(0.2f);
+			modeKey.OnInteract();
+			yield break;
+		}
+
+		if (split[0].EqualsIgnoreCase("TURN")) {
+			//int numberClicks = 0;
+			//int pos = 0;
+			if (split.Length != 2) {
+				yield return "sendtochaterror Incorrect Length";
+				yield break;
+			} if (!isValidPos(split[1], 1)) {
+				yield return "sendtochaterror " + split[1] + " is not valid";
+				yield break;
+			} else if (!MasterKey.GlobalKeyHeld && HasKey == 0) {
+				yield return "sendtochaterror Key is located somewhere else";
+				yield break;
+			}
+			if (HasKey == 1) { TwitchToggleKey(0); }
+
+			turnKey.OnInteract();
+			if (split[1].EqualsIgnoreCase("LEFT")) { TurnArrows[0].OnInteract(); } else { TurnArrows[1].OnInteract(); }
+			yield return new WaitForSeconds(0.2f);
+			turnKey.OnInteract();
+			yield break;
+		}
+
+		if (split[0].EqualsIgnoreCase("MOVE")) {
+			if (split.Length != 1) {
+				yield return "sendtochaterror Too many words in command!";
+				yield break;
+			}
+			MoveButton.OnInteract();
+			yield break;
+		}
+
+		if (split[0].EqualsIgnoreCase("RESET")) {
+			if (split.Length != 1) {
+				yield return "sendtochaterror Too many words in command!";
+				yield break;
+			} else if (!MasterKey.GlobalKeyHeld && HasKey == 0) {
+				yield return "sendtochaterror Key is located somewhere else";
+				yield break;
+			}
+			if (HasKey == 0) { TwitchToggleKey(0); }
+			KeyHoles[0].OnInteract();
+			yield return new WaitForSeconds(0.4f);
+			KeyHoles[0].OnInteractEnded();
+			yield return new WaitForSeconds(0.2f);
+			TwitchToggleKey(0);
+			yield break;
+		}
+
+		if (split[0].EqualsIgnoreCase("SUBMIT")) {
+			if (split.Length != 1) {
+				yield return "sendtochaterror Too many words in command!";
+				yield break;
+			} else if (!MasterKey.GlobalKeyHeld && HasKey == 0) {
+				yield return "sendtochaterror Key is located somewhere else";
+				yield break;
+			}
+			tpOverride = true;
+			if (HasKey == 1) { TwitchToggleKey(0); }
+			TwitchToggleKey(1);
+			KeyHoles[1].OnInteract();
+			yield return new WaitForSeconds(0.4f);
+			KeyHoles[1].OnInteractEnded();
+			yield return new WaitForSeconds(0.2f);
+			TwitchToggleKey(1);
+			if (moduleSolved) { Module.HandlePass(); } else { Module.HandleStrike(); }
+			tpOverride = false;
+			yield break;
+		}
+	}
+
+	void TwitchHandleForcedSolve() { //Autosolver
+		StartCoroutine(TPAutosolve());
+	}
+	
+	IEnumerator TPAutosolve () {
+		tpOverride = true;
+		while (!MasterKey.GlobalKeyHeld && HasKey == 0) { yield return new WaitForSeconds(0.1f); }
+		if (HasKey == 1) { TwitchToggleKey(0); }
+		
+		yield break;
 	}
 }

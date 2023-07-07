@@ -28,6 +28,7 @@ public class WindUpSafe : MonoBehaviour {
 	public TextMesh tempCombo;
 
 	public bool debugMode;
+	public int[] debugCode;
 
 	//-----------------------------------------------------//
 	private int dialVal = 0;
@@ -50,6 +51,7 @@ public class WindUpSafe : MonoBehaviour {
 	private bool HasKey = false;
 	int windID = 0;
 
+	int tpDirection = 1; // Right = 0 // Left = 1 // But why???
 	//-----------------------------------------------------//
 	static int moduleIdCounter = 1;
 	int moduleId;
@@ -92,9 +94,14 @@ public class WindUpSafe : MonoBehaviour {
 
 		for (int i = 0; i < 3; i++) {
 			solution[i] = UnityEngine.Random.Range(0, 12);
+			if (debugMode) { solution[i] = debugCode[i]; }
 		}
 		tempCombo.text = solution[0] + "-" + solution[1] + "-" + solution[2];
 		Debug.LogFormat("[Wind-Up Safe #{0}] Note reads {1}-{2}-{3}", moduleId, solution[0], solution[1], solution[2]);
+		if (PortCache.Count() == 0) {
+			PortCache = new List<string> {"DVI", "Parallel", "PS2", "RJ45", "Serial", "StereoRCA"};
+			Debug.LogFormat("[Wind-Up Safe #{0}] No Ports! Using all ciphers...", moduleId);
+		}
 		SolutionCipher();
 		Debug.LogFormat("[Wind-Up Safe #{0}] Final Combination is {1}-{2}-{3}", moduleId, solution[0], solution[1], solution[2]);
 		//Debug.LogFormat("[Wind-Up Lockpick #{0}] Solution is {1}-{2}-{3}", moduleId, solution[0]+1, solution[1]+1, solution[2]+1);
@@ -139,7 +146,9 @@ public class WindUpSafe : MonoBehaviour {
 			SetSolution("DVI");
 		}
 		if (PortCache.Contains("Parallel")) {
-			for (int i = 0; i < 3; i++) { solveCache[i] = solveCache[i] + Bomb.GetBatteryCount(); }
+			int shift = Bomb.GetBatteryCount();
+			if (shift == 0) { shift = 6; }
+			for (int i = 0; i < 3; i++) { solveCache[i] = solveCache[i] + shift; }
 			SetSolution("Parallel");
 		}
 		if (PortCache.Contains("PS2")) {
@@ -149,13 +158,20 @@ public class WindUpSafe : MonoBehaviour {
 			SetSolution("PS2");
 		}
 		if (PortCache.Contains("RJ45")) {
-			/*
-				Uses a small grid. Unsure how it will be set up. Might use number of strikes
-			*/
+			int[] gridCph = new int[] {
+				7, 2, 4,
+				3, 5, 11,
+				10, 6, 8,
+				1, 9, 0
+			};
+			solveCache[0] = gridCph[(solution[1]%3) + ((solution[2]%4)*3)];
+			solveCache[1] = gridCph[(solution[2]%3) + ((solution[0]%4)*3)];
+			solveCache[2] = gridCph[(solution[0]%3) + ((solution[1]%4)*3)];
 			SetSolution("RJ45");
 		}
 		if (PortCache.Contains("Serial")) {
 			int chunk = Bomb.GetPortCount();
+			if (chunk == 0) { chunk = 9; }
 			//while (chunk > 3) { chunk = chunk - 4; }
 			for (int i = 0; i < 3; i++) {
 				int dir = -1;
@@ -169,16 +185,33 @@ public class WindUpSafe : MonoBehaviour {
 			SetSolution("Serial");
 		}
 		if (PortCache.Contains("StereoRCA")) {
-			/*
-				Module will use 3rd and 6th serial number for something. Not sure what
-			*/
+			string serialNum = Bomb.GetSerialNumber();
+			int Ser3rd = 0;
+			int Ser6th = 0;
+			for (int x = 0; x < 6; x++) {
+				if (Regex.IsMatch(serialNum[x].ToString(), "[0-9]")) {
+					//startingLayer += serialNum[x] - '0';
+					if (x == 2) {
+						Ser3rd = serialNum[x] - '0';
+					} else if (x == 5) {
+						Ser6th = serialNum[x] - '0';
+					}
+				}
+			}
+			solveCache[0] = (solution[1] + Ser3rd) - (solution[2] + Ser6th);
+			solveCache[1] = (solution[2] + Ser3rd) - (solution[0] + Ser6th);
+			solveCache[2] = (solution[0] + Ser3rd) - (solution[1] + Ser6th);
+
 			SetSolution("StereoRCA");
 		}
 	}
 
 	void SetSolution (string cipher) {
+		Debug.Log("Cache = " + solveCache[0] + "-" + solveCache[1] + "-" + solveCache[2]);
 		for (int i = 0; i < 3; i++) {
-			if (solveCache[i] < 0) { solveCache[i] = 12+solveCache[i]; } else if (solveCache[i] > 11) { solveCache[i] = solveCache[i]-12; }
+			while (solveCache[i] > 11 || solveCache[i] < 0) {
+				if (solveCache[i] < 0) { solveCache[i] = 12+solveCache[i]; } else if (solveCache[i] > 11) { solveCache[i] = solveCache[i]-12; }
+			}
 			solution[i] = solveCache[i];
 		}
 		Debug.LogFormat("[Wind-Up Safe #{0}] {1} port found // New combination is {2}-{3}-{4}", moduleId, cipher, solution[0], solution[1], solution[2]);
@@ -259,8 +292,85 @@ public class WindUpSafe : MonoBehaviour {
 		if (currentStep == 2) { Debug.LogFormat("[Wind-Up Safe #{0}] Step 3 stored as {1}", moduleId, dialVal); } else if (currentStep != 3 && currentStep != 0) { Debug.LogFormat("[Wind-Up Safe #{0}] Combination discarded", moduleId); }
 		if (currentStep == 2 && submit[0] == solution[0] && submit[1] == solution[1] && submit[2] == solution[2]) { Debug.LogFormat("[Wind-Up Safe #{0}] Combination accepted", moduleId); Module.HandlePass(); modulePassed = true; } else if (currentStep == 2) { Debug.LogFormat("[Wind-Up Safe #{0}] Combination incorrect", moduleId); Module.HandleStrike(); }
 	}
+
+			// Twitch Plays Support
+
+#pragma warning disable 414
+	private readonly string TwitchHelpMessage = @"!{0} Grab -- Grab key (if applicable) || Turn [0-11] -- Turn to [num]";
+#pragma warning restore 414
+
+	bool isValidPos(string n) {
+		string[] valids = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"};
+		if (!valids.Contains(n)) { return false; }
+		return true;
+	}
+
+	IEnumerator ProcessTwitchCommand (string command) {
+		yield return null;
+
+		string[] split = command.ToUpperInvariant().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+		if (split[0].EqualsIgnoreCase("GRAB")) {
+			if (split.Length != 1) {
+				yield return "sendtochaterror Too many words in command!";
+				yield break;
+			} else if (!HasKey) {
+				yield return "sendtochaterror Key is located somewhere else or was already grabbed";
+				yield break;
+			}
+			KeyHole.OnInteract();
+			tpDirection = 1;
+			yield break;
+		}
+
+		if (split[0].EqualsIgnoreCase("TURN")) {
+			//int numberClicks = 0;
+			//int pos = 0;
+			if (split.Length != 2) {
+				yield return "sendtochaterror Too many words in command!";
+				yield break;
+			} else if (!isValidPos(split[1])) {
+				yield return "sendtochaterror " + split[1] + " is not valid";
+				yield break;
+			} else if (!MasterKey.GlobalKeyHeld && !HasKey) {
+				yield return "sendtochaterror Key is located somewhere else";
+				yield break;
+			}
+			int TPTURN = Int32.Parse(split[1]);
+			if (!HasKey) { KeyHole.OnInteract(); }
+			TurnArrows[tpDirection].OnInteract();
+			yield return new WaitForSeconds(0.1f);
+			while (dialVal != TPTURN) {
+				TurnArrows[tpDirection].OnInteract();
+				yield return new WaitForSeconds(0.1f);
+			}
+			tpDirection += 1;
+			if (tpDirection == 2) { tpDirection = 0; }
+			yield break;
+		}
+	}
+
+	void TwitchHandleForcedSolve() { //Autosolver
+		StartCoroutine(TPAutosolve());
+	}
 	
-	void Update () {
-		//if (needyActive) {  }
+	IEnumerator TPAutosolve () {
+		while (!MasterKey.GlobalKeyHeld && !HasKey) { yield return new WaitForSeconds(0.1f); }
+		if (HasKey) { KeyHole.OnInteract(); yield return new WaitForSeconds(0.1f); }
+		KeyHole.OnInteract();
+		tpDirection = 1;
+		for (int i = 0; i < 3; i++) {
+			TurnArrows[tpDirection].OnInteract();
+			yield return new WaitForSeconds(0.1f);
+			while (dialVal != solution[i]) {
+				TurnArrows[tpDirection].OnInteract();
+				yield return new WaitForSeconds(0.1f);
+			}
+
+			tpDirection ++;
+			if (tpDirection == 2) { tpDirection = 0; }
+		}
+		KeyHole.OnInteract();
+		yield break;
 	}
 }
