@@ -1,6 +1,13 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
+public abstract partial class KMDelegateEditor : Editor
+{
+    protected static readonly bool DelegateEditorsActive;
+    
+    protected bool SkipBase;
+}
+
 [CustomEditor(typeof(KMBombModule))]
 public class KMBombModuleEditor : KMDelegateEditor
 {
@@ -22,8 +29,11 @@ public class KMBombModuleEditor : KMDelegateEditor
 
             serializedObject.ApplyModifiedProperties();
             
-            SkipBase = true;
-            base.OnInspectorGUI();
+            if(DelegateEditorsActive)
+            {
+                SkipBase = true;
+                base.OnInspectorGUI();
+            }
         }
     }
 }
@@ -62,8 +72,11 @@ public class KMNeedyModuleEditor : KMDelegateEditor
 
             serializedObject.ApplyModifiedProperties();
             
-            SkipBase = true;
-            base.OnInspectorGUI();
+            if(DelegateEditorsActive)
+            {
+                SkipBase = true;
+                base.OnInspectorGUI();
+            }
         }
     }
 }

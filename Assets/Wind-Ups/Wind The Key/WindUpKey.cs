@@ -21,8 +21,8 @@ public class WindUpKey : MonoBehaviour {
 
 	public TextMesh timerDisplay;
 
-	public Material[] BulbColors;
-	public Renderer Bulb;
+	public StatusLight morseBulb;
+	public Transform ParentBulb; //Testing something...
 
 	public bool debugMode;
 	public int debugDisplay;
@@ -34,6 +34,7 @@ public class WindUpKey : MonoBehaviour {
 
 	private int blinkInterval = 0;
 	private bool bulbOn = false;
+	private bool firstTime = false;
 
 	private int displayNum = 0;
 
@@ -125,6 +126,12 @@ public class WindUpKey : MonoBehaviour {
 
 		InitSolution();
 		StartCoroutine(Animate());
+		StartCoroutine(InitLight());
+	}
+
+	IEnumerator InitLight () {
+		yield return new WaitForSeconds(0.05f);
+		BulbSetup();
 	}
 
 	IEnumerator CheckKey () {
@@ -251,7 +258,8 @@ public class WindUpKey : MonoBehaviour {
 		startHold = 0;
 		endHold = 0;
 		flashMorseChar = 0;
-		Bulb.material = BulbColors[0];
+		//Bulb.material = BulbColors[0];//Replace
+		BulbState(false);
 		held = false;
 		releaseTimer = 0;
 	}
@@ -279,7 +287,8 @@ public class WindUpKey : MonoBehaviour {
 				releaseTimer++;
 				if (blinkInterval == 0) {
 					bulbOn = morseTable[flashMorseIndex][flashMorseChar] == 1;
-					if (bulbOn) { Bulb.material = BulbColors[1]; } else { Bulb.material = BulbColors[0]; }
+					//if (bulbOn) { Bulb.material = BulbColors[1]; } else { Bulb.material = BulbColors[0]; }
+					BulbState(bulbOn);
 					flashMorseChar++;
 					if (flashMorseChar == morseTable[flashMorseIndex].Count) { blinkInterval = 80; flashMorseChar = 0; } else { blinkInterval = 20; }
 					//Debug.Log(flashMorseIndex + ", " + flashMorseChar + ", " + morseTable[flashMorseIndex][flashMorseChar] + ", " + bulbOn);
@@ -289,6 +298,37 @@ public class WindUpKey : MonoBehaviour {
 
 			yield return new WaitForSeconds(0.01f);
 		}
+	}
+
+	void BulbSetup() {
+		Debug.Log("I'm Here");
+		Debug.Log(morseBulb == null);
+		Debug.Log("Fuckhead");
+		morseBulb.InactiveLight.GetComponent<MeshFilter>().mesh = FindDeep(ParentBulb, "Component_LED_OFF").gameObject.GetComponent<MeshFilter>().mesh;
+		firstTime = true;
+		morseBulb.InactiveLight.GetComponent<Renderer>().material = FindDeep(ParentBulb, "Component_LED_OFF").gameObject.GetComponent<Renderer>().material;
+		morseBulb.StrikeLight.GetComponent<MeshFilter>().mesh = FindDeep(ParentBulb, "Component_LED_STRIKE").gameObject.GetComponent<MeshFilter>().mesh;
+		morseBulb.StrikeLight.GetComponent<Renderer>().material = FindDeep(ParentBulb, "Component_LED_STRIKE").gameObject.GetComponent<Renderer>().material;
+		BulbState(false);
+	}
+
+	Transform FindDeep (Transform PARENT, string CHILD) {
+		var result = PARENT.Find(CHILD);
+		if (!firstTime) { Debug.Log("DEBUG // Scanning " + PARENT.name); } //Search for light gameobjects in case of discrepencies between modkit and game
+		if (result != null)
+			return result;
+		foreach (Transform child in PARENT) {
+			result = FindDeep(child, CHILD);
+			if (result != null)
+				return result;
+		}
+		//Debug.Log("Go Fuck Yourself");
+		return null;
+	}
+
+	void BulbState(bool STATE) {
+		morseBulb.InactiveLight.SetActive(!STATE);
+		morseBulb.StrikeLight.SetActive(STATE);
 	}
 
 	void CheckSolve() {
@@ -305,7 +345,8 @@ public class WindUpKey : MonoBehaviour {
 		if ((timedRelease && checkTimed(endHold, requiredSeconds)) || (instantRelease && releaseTimer < 60) || (!timedRelease && !instantRelease && checkMatch(requiredDigit.ToString()))) {
 			Debug.LogFormat("[Wind The Key #{0}] Module Passed", moduleId);
 			moduleSolved = true;
-			Bulb.material = BulbColors[0];
+			//Bulb.material = BulbColors[0];
+			BulbState(false);
 			timerDisplay.text = "";
 			if (!tpOverride) { Module.HandlePass(); }
 		} else {

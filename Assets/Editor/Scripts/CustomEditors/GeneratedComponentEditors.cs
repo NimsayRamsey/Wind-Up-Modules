@@ -10,7 +10,7 @@ public class GeneratedComponentEditor : Editor
         if (!enabled)
         {
             EditorGUILayout.HelpBox(
-                "This component is managed automatically and is not intended to be edited by the user.",
+                "This component is managed automatically and is not intended to be edited or removed by the user.",
                 MessageType.Warning);
             enabled = GUILayout.Button("Edit anyway");
         }
@@ -25,7 +25,7 @@ public class KMMaterialInfoEditor : GeneratedComponentEditor
 {
 }
 
-[CustomEditor(typeof(KMDelegateInfo)), CanEditMultipleObjects]
-public class KMDelegateInfoEditor : GeneratedComponentEditor
+[CustomEditor(typeof(AssemblyShare)), CanEditMultipleObjects]
+public class AssemblyShareEditor : GeneratedComponentEditor
 {
 }

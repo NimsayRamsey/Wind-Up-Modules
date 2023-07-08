@@ -1,0 +1,8 @@
+{
+  "name": "windUpModules",
+  "references": [
+    "GameProxies"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": []
+}

@@ -1,0 +1,10 @@
+{
+  "name": "windUpModules-Editor",
+  "references": [
+    "windUpModules"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": []
+}
