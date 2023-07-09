@@ -21,7 +21,7 @@ public class WindUpKey : MonoBehaviour {
 
 	public TextMesh timerDisplay;
 
-	public StatusLight morseBulb;
+	public GameObject[] morseBulbs;
 	public Transform ParentBulb; //Testing something...
 
 	public bool debugMode;
@@ -126,11 +126,12 @@ public class WindUpKey : MonoBehaviour {
 
 		InitSolution();
 		StartCoroutine(Animate());
+		//BulbSetup();
 		StartCoroutine(InitLight());
 	}
 
 	IEnumerator InitLight () {
-		yield return new WaitForSeconds(0.05f);
+		yield return new WaitForSeconds(0.02f);
 		BulbSetup();
 	}
 
@@ -301,14 +302,19 @@ public class WindUpKey : MonoBehaviour {
 	}
 
 	void BulbSetup() {
-		Debug.Log("I'm Here");
-		Debug.Log(morseBulb == null);
-		Debug.Log("Fuckhead");
-		morseBulb.InactiveLight.GetComponent<MeshFilter>().mesh = FindDeep(ParentBulb, "Component_LED_OFF").gameObject.GetComponent<MeshFilter>().mesh;
+		//MorseBulbData.InactiveLight = morseBulb.GetComponent<StatusLight>().InactiveLight; //BackupBulbs[0];
+		//MorseBulbData.StrikeLight = morseBulb.GetComponent<StatusLight>().StrikeLight;
+		Debug.Log(morseBulbs[1] == null);
+		Debug.Log(FindDeep(ParentBulb, "Component_LED_STRIKE") == null);
 		firstTime = true;
-		morseBulb.InactiveLight.GetComponent<Renderer>().material = FindDeep(ParentBulb, "Component_LED_OFF").gameObject.GetComponent<Renderer>().material;
-		morseBulb.StrikeLight.GetComponent<MeshFilter>().mesh = FindDeep(ParentBulb, "Component_LED_STRIKE").gameObject.GetComponent<MeshFilter>().mesh;
-		morseBulb.StrikeLight.GetComponent<Renderer>().material = FindDeep(ParentBulb, "Component_LED_STRIKE").gameObject.GetComponent<Renderer>().material;
+		morseBulbs[0].GetComponent<MeshFilter>().mesh = FindDeep(ParentBulb, "Component_LED_OFF").gameObject.GetComponent<MeshFilter>().mesh;
+		Debug.Log("Checkpoint A");
+		morseBulbs[0].GetComponent<Renderer>().material = FindDeep(ParentBulb, "Component_LED_OFF").gameObject.GetComponent<Renderer>().material;
+		Debug.Log("Checkpoint B");
+		morseBulbs[1].GetComponent<MeshFilter>().mesh = FindDeep(ParentBulb, "Component_LED_STRIKE").gameObject.GetComponent<MeshFilter>().mesh;
+		Debug.Log("Checkpoint C");
+		morseBulbs[1].GetComponent<Renderer>().material = FindDeep(ParentBulb, "Component_LED_STRIKE").gameObject.GetComponent<Renderer>().material;
+		Debug.Log("Checkpoint D");
 		BulbState(false);
 	}
 
@@ -327,9 +333,19 @@ public class WindUpKey : MonoBehaviour {
 	}
 
 	void BulbState(bool STATE) {
-		morseBulb.InactiveLight.SetActive(!STATE);
-		morseBulb.StrikeLight.SetActive(STATE);
+		morseBulbs[0].SetActive(!STATE);
+		morseBulbs[1].SetActive(STATE);
 	}
+
+	/*public StatusLight MorseBulb {
+		get {
+			if (!MorseBulbData) {
+				MorseBulbData = gameObject.AddComponent<StatusLight>();
+				//morseBulb.PassLight = /* /;
+			}
+			return MorseBulbData;
+		}
+	}*/
 
 	void CheckSolve() {
 		if (moduleSolved) { return; }
