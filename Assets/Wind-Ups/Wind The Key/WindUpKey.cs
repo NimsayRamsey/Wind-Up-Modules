@@ -34,7 +34,7 @@ public class WindUpKey : MonoBehaviour {
 
 	private int blinkInterval = 0;
 	private bool bulbOn = false;
-	private bool firstTime = false;
+	private bool firstTime = true;
 
 	private int displayNum = 0;
 
@@ -304,17 +304,25 @@ public class WindUpKey : MonoBehaviour {
 	void BulbSetup() {
 		//MorseBulbData.InactiveLight = morseBulb.GetComponent<StatusLight>().InactiveLight; //BackupBulbs[0];
 		//MorseBulbData.StrikeLight = morseBulb.GetComponent<StatusLight>().StrikeLight;
+		string lightStrikeName = "Component_LED_STRIKE_mesh";
+		if (Application.isEditor) { lightStrikeName = "Component_LED_STRIKE"; }
+
 		Debug.Log(morseBulbs[1] == null);
 		Debug.Log(FindDeep(ParentBulb, "Component_LED_STRIKE") == null);
-		firstTime = true;
 		morseBulbs[0].GetComponent<MeshFilter>().mesh = FindDeep(ParentBulb, "Component_LED_OFF").gameObject.GetComponent<MeshFilter>().mesh;
 		Debug.Log("Checkpoint A");
 		morseBulbs[0].GetComponent<Renderer>().material = FindDeep(ParentBulb, "Component_LED_OFF").gameObject.GetComponent<Renderer>().material;
 		Debug.Log("Checkpoint B");
-		morseBulbs[1].GetComponent<MeshFilter>().mesh = FindDeep(ParentBulb, "Component_LED_STRIKE").gameObject.GetComponent<MeshFilter>().mesh;
+		firstTime = false;
+		morseBulbs[1].GetComponent<MeshFilter>().mesh = FindDeep(ParentBulb, lightStrikeName).gameObject.GetComponent<MeshFilter>().mesh;
+		firstTime = true;
 		Debug.Log("Checkpoint C");
-		morseBulbs[1].GetComponent<Renderer>().material = FindDeep(ParentBulb, "Component_LED_STRIKE").gameObject.GetComponent<Renderer>().material;
+		morseBulbs[1].GetComponent<Renderer>().material = FindDeep(ParentBulb, lightStrikeName).gameObject.GetComponent<Renderer>().material;
 		Debug.Log("Checkpoint D");
+		if (!Application.isEditor) {
+			morseBulbs[2] = FindDeep(ParentBulb, "LightGlow").gameObject;
+			Debug.Log("Checkpoint E");
+		}
 		BulbState(false);
 	}
 
@@ -335,6 +343,8 @@ public class WindUpKey : MonoBehaviour {
 	void BulbState(bool STATE) {
 		morseBulbs[0].SetActive(!STATE);
 		morseBulbs[1].SetActive(STATE);
+		if (!Application.isEditor) { morseBulbs[2].SetActive(STATE); }
+		//REMINDER: Grab LightGlow, child of Component_LED_STRIKE
 	}
 
 	/*public StatusLight MorseBulb {

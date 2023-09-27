@@ -1553,6 +1553,7 @@ MonoBehaviour:
   morseBulbs:
   - {fileID: 1453903829135004}
   - {fileID: 1136992796333224}
+  - {fileID: 0}
   ParentBulb: {fileID: 4139770083948186}
   debugMode: 0
   debugDisplay: 0
