@@ -14,8 +14,9 @@ MonoBehaviour:
   id: windUpModules
   title: Wind-Up Modules
   author: Nimsay Ramsey
-  description: A series of modules centered around shuffling a single wind-up key
-    between multiple modules
+  description: "A series of modules centered around shuffling a single wind-up key
+    between multiple modules\n\nContains 6 modules, 1 needy, and a unique key gimmick.\nHTML:
+    Coming Soon\r\nPDF: Coming Soon\r\nModule IDs:\r\nwindTimer\r\nwindMusic\r\nwindKey\r\nwindGrommet\r\nwindSafe\r\nwindMaze\r\nwindSimon"
   version: 1
   outputFolder: build
-  previewImage: {fileID: 0}
+  previewImage: {fileID: 2800000, guid: f8de6596021cd7a4783a98cb05f7ba7a, type: 3}
