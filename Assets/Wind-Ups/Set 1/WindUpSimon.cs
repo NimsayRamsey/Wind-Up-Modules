@@ -22,13 +22,13 @@ public class WindUpSimon : MonoBehaviour {
 	public Transform[] KeyRotation;
 
 	public KMSelectable[] Buttons; //Blue, Yellow, Green, Red
-	public GameObject[] ButtonRend;
-	public TextMesh[] ButtonLabels;
+	public GameObject[] ButtonSelect;
+	public TextMesh StageLabel;//[] ButtonLabels;
 
-	public Material[] StageMats;//B, Blit, Y, Ylit, G, Glit, R, Rlit
-	public Renderer[] StageForms;//Blue, Yellow, Green, Red
-	public Material LightMatExtra;//grey
-	public Renderer LightForm;
+	public Material[] ButtonMats;//B, Blit, Y, Ylit, G, Glit, R, Rlit
+	public Renderer[] ButtonForms;//Blue, Yellow, Green, Red
+	public Transform[] ButtonTrans;//Blue, Yellow, Green, Red
+	//public Renderer LightForm;
 	
 	public GameObject ColorblindDisplay;
 	public TextMesh ColorblindText;
@@ -38,12 +38,15 @@ public class WindUpSimon : MonoBehaviour {
 	//-----------------------------------------------------//
 	private int turnFrame = 0;
 	private int direction = 0;
+	private int pushFrame = 0;
+	private int pushID = 0;
 
 	private int viewStage = 0;
 	private int[] submitSequence = new int[] {4, 4, 4, 4};
 	private int[] targetSequence = new int[] {4, 4, 4, 4};
 	private int[] shownSequence = new int[] {4, 4, 4, 4};
 	private int submitPos = 0;
+	private string[] stageGlyphs = new string[] {"", "", "", ""};
 
 	private string[] colorLabels = new string[] { "B", "Y", "G", "R" };
 	private bool colorFlash = false;
@@ -101,6 +104,12 @@ public class WindUpSimon : MonoBehaviour {
 		StartCoroutine(CheckKey());
 
 		InitSolution();
+		
+		viewStage = UnityEngine.Random.Range(0, 4);		// Sets the viewing to a random stage
+		KeyRotation[0].Rotate(0.0f, 0.0f, -90.0f*viewStage); //Since initial stage order isn't important
+		KeyRotation[1].Rotate(0.0f, 90.0f*viewStage, 0.0f);
+
+		StageLabel.text = stageGlyphs[viewStage];
 		StartCoroutine(Animate());
 	}
 
@@ -120,7 +129,7 @@ public class WindUpSimon : MonoBehaviour {
 			Key.SetActive(true);
 			TurnArrowsTransform[0].SetActive(true);
 			TurnArrowsTransform[1].SetActive(true);
-			foreach (GameObject button in ButtonRend) { button.SetActive(false); }
+			foreach (GameObject button in ButtonSelect) { button.SetActive(false); }
 			Debug.LogFormat("[Wind-Up Simon #{0}] Starting with key", moduleId);
 		}
 		//Debug.LogFormat("[Wind-Up Grommets #{0}] Max ID is {1}", moduleId, MasterKey.windIdCounter);
@@ -138,7 +147,7 @@ public class WindUpSimon : MonoBehaviour {
 			targetSequence[sequenceOrder[i]] = UnityEngine.Random.Range(0, 4);
 			shownSequence[i] = targetSequence[sequenceOrder[i]];
 			//Debug.Log(shownSequence[i]);
-			ButtonLabels[i].text = glyphLabels[sequenceOrder[i], UnityEngine.Random.Range(0, 14)];
+			stageGlyphs[i] = glyphLabels[sequenceOrder[i], UnityEngine.Random.Range(0, 14)];
 			//Debug.Log(sequenceOrder[i] + " = " + sequenceOrder[i] + " = " + targetSequence[sequenceOrder[i]]);
 		}
 		Debug.LogFormat("[Wind-Up Simon #{0}] Shown Sequence is {1}-{2}-{3}-{4}", moduleId, colorLabels[targetSequence[sequenceOrder[0]]], colorLabels[targetSequence[sequenceOrder[1]]], colorLabels[targetSequence[sequenceOrder[2]]], colorLabels[targetSequence[sequenceOrder[3]]]);
@@ -156,7 +165,7 @@ public class WindUpSimon : MonoBehaviour {
 			Key.SetActive(true);
 			TurnArrowsTransform[0].SetActive(true);
 			TurnArrowsTransform[1].SetActive(true);
-			foreach (GameObject button in ButtonRend) { button.SetActive(false); }
+			foreach (GameObject button in ButtonSelect) { button.SetActive(false); }
 			Audio.PlaySoundAtTransform("Key_In", transform);
 		} else if (HasKey) {
 			MasterKey.GlobalKeyHeld = true;
@@ -164,7 +173,7 @@ public class WindUpSimon : MonoBehaviour {
 			Key.SetActive(false);
 			TurnArrowsTransform[0].SetActive(false);
 			TurnArrowsTransform[1].SetActive(false);
-			foreach (GameObject button in ButtonRend) { button.SetActive(true); }
+			foreach (GameObject button in ButtonSelect) { button.SetActive(true); }
 			Audio.PlaySoundAtTransform("keys_01", transform);
 		}
 	}
@@ -183,7 +192,14 @@ public class WindUpSimon : MonoBehaviour {
 	}
 
 	void Press(KMSelectable Button) {
+		if (pushFrame != 0) { return; }
 		int buttonNum = Array.IndexOf(Buttons, Button);
+		pushID = buttonNum;
+		pushFrame = 9;
+		colorFlash = false;
+		colorTimer = -80;
+		ColorblindText.text = "";
+		for(int i = 0; i < 4; i++) { ButtonForms[i].material = ButtonMats[i*2]; }
 		submitSequence[submitPos] = buttonNum;
 		Audio.PlaySoundAtTransform("Enter Color", transform);
 		submitPos++;
@@ -196,12 +212,9 @@ public class WindUpSimon : MonoBehaviour {
 	void LightStage() {
 		viewStage += direction;
 		if (viewStage < 0) { viewStage = 3; } else if (viewStage > 3) { viewStage = 0; }
-		for(int i = 0; i < 4; i++) {
-			StageForms[i].material = StageMats[i*2];
-			if (viewStage == i) { StageForms[i].material = StageMats[i*2+1]; }
-		}
+		StageLabel.text = stageGlyphs[viewStage];
+		for(int i = 0; i < 4; i++) { ButtonForms[i].material = ButtonMats[i*2]; }
 		
-		LightForm.material = LightMatExtra;
 		ColorblindText.text = "";
 		colorFlash = false;
 		colorTimer = 0;
@@ -229,24 +242,35 @@ public class WindUpSimon : MonoBehaviour {
 				KeyRotation[1].Rotate(0.0f, 10.0f*direction, 0.0f);
 				turnFrame--;
 			}
+			if (pushFrame != 0) {
+				if (pushFrame > 5) { ButtonTrans[pushID].localPosition += Vector3.up * -0.001f; }
+				if (pushFrame < 5) { ButtonTrans[pushID].localPosition += Vector3.up * 0.001f; }
+				ButtonForms[pushID].material = ButtonMats[pushID*2+1];
+				pushFrame--;
+				if (pushFrame == 0) { ButtonForms[pushID].material = ButtonMats[pushID*2]; }
+				colorFlash = false;
+				colorTimer = -80;
+			}
 
 			if (!moduleSolved) {
 				colorTimer++;
 				if (!colorFlash && colorTimer == 40) {
 					colorFlash = !colorFlash;
-					LightForm.material = StageMats[shownSequence[viewStage]*2+1];//targetSequence[
+					ButtonForms[shownSequence[viewStage]].material = ButtonMats[shownSequence[viewStage]*2+1];
+					//LightForm.material = ButtonMats[shownSequence[viewStage]*2+1];//targetSequence[
 					ColorblindText.text = colorLabels[shownSequence[viewStage]];
 
+					submitPos = 0; //Reset submitted if you take too long to input
 					colorTimer = 0;
 				} else if (colorFlash && colorTimer == 20) {
 					colorFlash = !colorFlash;
-					LightForm.material = LightMatExtra;
+					ButtonForms[shownSequence[viewStage]].material = ButtonMats[shownSequence[viewStage]*2];
 					ColorblindText.text = "";
 
 					colorTimer = 0;
 				}
 			} else {
-				LightForm.material = LightMatExtra;
+				ButtonForms[shownSequence[viewStage]].material = ButtonMats[shownSequence[viewStage]*2];
 				ColorblindText.text = "";
 			}
 
