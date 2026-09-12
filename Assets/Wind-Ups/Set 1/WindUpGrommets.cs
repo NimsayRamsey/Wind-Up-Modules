@@ -112,6 +112,12 @@ public class WindUpGrommets : MonoBehaviour {
 			FrameForms[i*2+1].material = FrameMats[frameVals[i]];
 			if (i == 3) { FrameForms[i*2+2].material = FrameMats[frameVals[4]]; }
 		}
+		string[] dbMatLst = new string[] {"Copper", "Brass", "Steel"};
+		Debug.LogFormat("[Wind-Up Grommets #{0}] Materials in reading order:", moduleId);
+		Debug.LogFormat("[Wind-Up Grommets #{0}] Turn pegs: {1}, {2}, {3}", moduleId, dbMatLst[frameVals[0]], dbMatLst[frameVals[1]], dbMatLst[frameVals[2]]);
+		Debug.LogFormat("[Wind-Up Grommets #{0}] Solve peg: {1}", moduleId, dbMatLst[frameVals[3]]);
+		Debug.LogFormat("[Wind-Up Grommets #{0}] Solve Washer: {1}", moduleId, dbMatLst[frameVals[4]]);
+		
 		if (conditionCheck(0)) { // All 3 turn pegs are the same
 			if (conditionCheck(1)) {
 				int j = 2;

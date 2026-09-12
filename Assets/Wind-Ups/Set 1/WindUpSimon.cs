@@ -246,6 +246,7 @@ public class WindUpSimon : MonoBehaviour {
 				if (pushFrame > 5) { ButtonTrans[pushID].localPosition += Vector3.up * -0.001f; }
 				if (pushFrame < 5) { ButtonTrans[pushID].localPosition += Vector3.up * 0.001f; }
 				ButtonForms[pushID].material = ButtonMats[pushID*2+1];
+				
 				pushFrame--;
 				if (pushFrame == 0) { ButtonForms[pushID].material = ButtonMats[pushID*2]; }
 				colorFlash = false;
@@ -257,7 +258,6 @@ public class WindUpSimon : MonoBehaviour {
 				if (!colorFlash && colorTimer == 40) {
 					colorFlash = !colorFlash;
 					ButtonForms[shownSequence[viewStage]].material = ButtonMats[shownSequence[viewStage]*2+1];
-					//LightForm.material = ButtonMats[shownSequence[viewStage]*2+1];//targetSequence[
 					ColorblindText.text = colorLabels[shownSequence[viewStage]];
 
 					submitPos = 0; //Reset submitted if you take too long to input
@@ -270,7 +270,6 @@ public class WindUpSimon : MonoBehaviour {
 					colorTimer = 0;
 				}
 			} else {
-				ButtonForms[shownSequence[viewStage]].material = ButtonMats[shownSequence[viewStage]*2];
 				ColorblindText.text = "";
 			}
 
@@ -357,7 +356,7 @@ public class WindUpSimon : MonoBehaviour {
 			if (HasKey) { KeyHole.OnInteract(); }
 			for (int i = 0; i < 4; i++) {
 				Buttons[TPCODE[i]].OnInteract();
-				yield return new WaitForSeconds(0.1f);
+				yield return new WaitForSeconds(0.2f);
 			}
 			yield break;
 		}

@@ -207,7 +207,7 @@ public class WindUpSafe : MonoBehaviour {
 	}
 
 	void SetSolution (string cipher) {
-		Debug.Log("Cache = " + solveCache[0] + "-" + solveCache[1] + "-" + solveCache[2]);
+		//Debug.Log("Cache = " + solveCache[0] + "-" + solveCache[1] + "-" + solveCache[2]);
 		for (int i = 0; i < 3; i++) {
 			while (solveCache[i] > 11 || solveCache[i] < 0) {
 				if (solveCache[i] < 0) { solveCache[i] = 12+solveCache[i]; } else if (solveCache[i] > 11) { solveCache[i] = solveCache[i]-12; }

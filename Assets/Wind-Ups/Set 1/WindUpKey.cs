@@ -384,6 +384,7 @@ public class WindUpKey : MonoBehaviour {
 
 	bool checkMatch(string CHECK) {
 		string time = Bomb.GetFormattedTime();
+		Debug.Log(time);
 		if (time.Contains(CHECK)) { return true; } else { return false; }
 	}
 
@@ -396,7 +397,7 @@ public class WindUpKey : MonoBehaviour {
 	}
 
 #pragma warning disable 414
-	private readonly string TwitchHelpMessage = @"!{0} Grab -- Grab key (if applicable) || Hold [seconds] -- Turn the key for # seconds || Hold to [digit] -- Holds key until # appears in timer";
+	private readonly string TwitchHelpMessage = @"!{0} Grab -- Grab key (if applicable) || Hold -- Turn the key || Hold [seconds] -- Turn the key for # seconds || Release at -- Release holding the key at # digit";
 #pragma warning restore 414
 
 	bool isValidPos(string n) {
@@ -427,31 +428,11 @@ public class WindUpKey : MonoBehaviour {
 		if (split[0].EqualsIgnoreCase("HOLD")) {
 			//int numberClicks = 0;
 			//int pos = 0;
-			if (split.Length != 2) {
-				// HOLD TO
-				if (split.Length != 3) {
-					yield return "sendtochaterror Too many words in command!";
-					yield break;
-				} else if (!split[1].EqualsIgnoreCase("TO")) {
-					yield return "sendtochaterror Wrong command!";
-					yield break;
-				} else if (!isValidPos(split[2])) {
-					yield return "sendtochaterror " + split[2] + " is not valid";
-					yield break;
-				} else if (!MasterKey.GlobalKeyHeld && !HasKey) {
-					yield return "sendtochaterror Key is located somewhere else";
-					yield break;
-				}
-				if (!HasKey) { KeyHole.OnInteract(); KeyHole.OnInteractEnded(); yield return new WaitForSeconds(0.1f); }
+
+			if (split.Length == 1){
 				KeyHole.OnInteract();
-				yield return new WaitForSeconds(0.3f);
-				while (!checkMatch(split[2])) { yield return new WaitForSeconds(0.1f); }
 				tpOverride = true;
-				KeyHole.OnInteractEnded();
-				yield return new WaitForSeconds(0.1f);
-				TwitchEndCheck();
 				yield break;
-				
 			//HOLD
 			} else if (!isValidPos(split[1])) {
 				yield return "sendtochaterror " + split[1] + " is not valid";
@@ -467,6 +448,31 @@ public class WindUpKey : MonoBehaviour {
 			} else {
 				while (!checkTimed((int)Bomb.GetTime(), Int32.Parse(split[1]))) { yield return new WaitForSeconds(0.1f); }
 			}
+			tpOverride = true;
+			KeyHole.OnInteractEnded();
+			yield return new WaitForSeconds(0.1f);
+			TwitchEndCheck();
+			yield break;
+		}
+
+
+		if (split[0].EqualsIgnoreCase("RELEASE") && split[1].EqualsIgnoreCase("AT")) {
+			if (split.Length != 3) {
+				yield return "sendtochaterror Too many words in command!";
+				yield break;
+			} else if (!isValidPos(split[2])) {
+				yield return "sendtochaterror " + split[2] + " is not valid";
+				yield break;
+			} else if (!MasterKey.GlobalKeyHeld && !HasKey) {
+				yield return "sendtochaterror Key is located somewhere else";
+				yield break;
+			}
+			if (!tpOverride) {
+				if (!HasKey) { KeyHole.OnInteract(); KeyHole.OnInteractEnded(); yield return new WaitForSeconds(0.1f); }
+			}
+			KeyHole.OnInteract();
+			yield return new WaitForSeconds(0.3f);
+			while (!checkMatch(split[2])) { yield return new WaitForSeconds(0.1f); }
 			tpOverride = true;
 			KeyHole.OnInteractEnded();
 			yield return new WaitForSeconds(0.1f);
