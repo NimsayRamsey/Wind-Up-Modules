@@ -165,7 +165,7 @@ public class WindUpMaze : MonoBehaviour {
 		StartCoroutine(CheckKey());
 
 		InitSolution();
-		Debug.LogFormat("[Wind-Up Maze #{0}] Maze is {1}. Starting at {2}, {3}. Solution is on {4}, {5}", moduleId, mazeNames[chosenMaze], coords[0], coords[1], mainCoords[1, 0], mainCoords[1, 1]);
+		Debug.LogFormat("[Wind-Up Maze #{0}] Maze is {1}. Starting at x{2}, y{3}. Solution is on x{4}, y{5}", moduleId, mazeNames[chosenMaze], coords[0], coords[1], mainCoords[1, 0], mainCoords[1, 1]);
 		StartCoroutine(Animate());
 	}
 
@@ -294,11 +294,11 @@ public class WindUpMaze : MonoBehaviour {
 		bool wall = Mazes[chosenMaze, (coords[0] + (coords[1] * 4)), ((facing % 2)+1 + faceOrder[facing, mDir])];
 		//Debug.Log(wall);
 		if (!wall) {
-			Debug.LogFormat("[Wind-Up Maze #{0}] Hit a wall at {1}, {2} facing {3}. Striking", moduleId, coords[0], coords[1], faceName[facing]);
+			Debug.LogFormat("[Wind-Up Maze #{0}] Hit a wall at x{1}, y{2} facing {3}. Striking", moduleId, coords[0], coords[1], faceName[facing]);
 			Module.HandleStrike();
 			return;
 		} else { coords[0] += faceOrder[facing, 0]; coords[1] += faceOrder[facing, 1]; }
-		Debug.LogFormat("[Wind-Up Maze #{0}] Moved to {1}, {2}", moduleId, coords[0], coords[1]);
+		Debug.LogFormat("[Wind-Up Maze #{0}] Moved to x{1}, y{2}", moduleId, coords[0], coords[1]);
 	}
 
 	void PlaceKey () {
@@ -458,10 +458,10 @@ public class WindUpMaze : MonoBehaviour {
 			coords[0] = mainCoords[0, 0];
 			coords[1] = mainCoords[0, 1];
 			facing = 0;
-			Debug.LogFormat("[Wind-Up Maze #{0}] Resetting to {1}, {2} facing {3}", moduleId, coords[0], coords[1], faceName[facing]);
+			Debug.LogFormat("[Wind-Up Maze #{0}] Resetting to x{1}, y{2} facing {3}", moduleId, coords[0], coords[1], faceName[facing]);
 			return;
 		}
-		Debug.LogFormat("[Wind-Up Maze #{0}] Submitted {1}, {2}", moduleId, coords[0], coords[1]);
+		Debug.LogFormat("[Wind-Up Maze #{0}] Submitted x{1}, y{2}", moduleId, coords[0], coords[1]);
 		if (coords[0] == mainCoords[1, 0] && coords[1] == mainCoords[1, 1]) {
 			Debug.LogFormat("[Wind-Up Maze #{0}] Correct", moduleId);
 			moduleSolved = true;
@@ -469,7 +469,7 @@ public class WindUpMaze : MonoBehaviour {
 		} else {
 			coords = new int[] {mainCoords[0, 0], mainCoords[0, 1]};
 			facing = 0;
-			Debug.LogFormat("[Wind-Up Maze #{0}] Wrong. Striking and resetting to {1}, {2} facing {3}", moduleId, coords[0], coords[1], faceName[facing]);
+			Debug.LogFormat("[Wind-Up Maze #{0}] Wrong. Striking and resetting to x{1}, y{2} facing {3}", moduleId, coords[0], coords[1], faceName[facing]);
 			if (!tpOverride) { Module.HandleStrike(); }
 		}
 	}

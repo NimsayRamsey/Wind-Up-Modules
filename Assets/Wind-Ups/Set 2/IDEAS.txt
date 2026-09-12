@@ -1,0 +1,6 @@
+Wind Up Combination is switches but with 4 states instead of 2
+
+
+Fixed TP for Wind the Key
+Wind up Maze log outputs specify x and y to make reading it back easier
+ - Fixed rule 2 of Wind the Key with unlit CLR
