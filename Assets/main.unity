@@ -929,7 +929,7 @@ Prefab:
     - target: {fileID: 114848120511536268, guid: 8814ea52310d2614a9feda02ec355ae4,
         type: 2}
       propertyPath: FrontFaceOnly
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114848120511536268, guid: 8814ea52310d2614a9feda02ec355ae4,
         type: 2}
@@ -1200,7 +1200,8 @@ Prefab:
         type: 2}
       propertyPath: EdgeworkConfiguration
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 11400000, guid: 67367cd0fafec7e4bab9b1f91d6f080e,
+        type: 2}
     - target: {fileID: 114848120511536268, guid: 8814ea52310d2614a9feda02ec355ae4,
         type: 2}
       propertyPath: TwitchPlaysActive
