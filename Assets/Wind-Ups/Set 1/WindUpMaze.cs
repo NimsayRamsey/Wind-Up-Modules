@@ -1,10 +1,11 @@
-﻿using System;
+﻿using KModkit;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
-using KModkit;
+using static Enums;
 
 public class WindUpMaze : MonoBehaviour {
 
@@ -35,8 +36,11 @@ public class WindUpMaze : MonoBehaviour {
 	public bool debugMode;
 	public int debugMaze;
 
-	//-----------------------------------------------------//
-	private int heldFrame = 0;
+	private List<ModuleState> path;
+	private List<string> pathString;
+
+    //-----------------------------------------------------//
+    private int heldFrame = 0;
 	private bool held = false;
 
 	private int[,] mainCoords = new int[,] { {0, 0}, {0, 0} };
@@ -57,7 +61,8 @@ public class WindUpMaze : MonoBehaviour {
 
 	private int chosenMaze = 11;
 	private string[] mazeNames = new string[] { "SND", "IND", "FRK", "FRQ", "NSA", "MSA", "TRN", "CLR", "SIG", "BOB", "CAR", "NLL" };
-	private bool[,,] Mazes = new bool[,,] { // Up, Left, Down, Right // 
+
+    private bool[,,] Mazes = new bool[,,] { // Up, Left, Down, Right // 
 		{    // SND
 			{false, false, true, false}, {false, false, false, true}, {false, true, true, true}, {false, true, true, false},
 			{true, false, true, false}, {false, false, true, true}, {true, true, true, false}, {true, false, false, false},
@@ -167,7 +172,34 @@ public class WindUpMaze : MonoBehaviour {
 		InitSolution();
 		Debug.LogFormat("[Wind-Up Maze #{0}] Maze is {1}. Starting at x{2}, y{3}. Solution is on x{4}, y{5}", moduleId, mazeNames[chosenMaze], coords[0], coords[1], mainCoords[1, 0], mainCoords[1, 1]);
 		StartCoroutine(Animate());
+		bool[,] maze = GetMaze(chosenMaze);
+        ModuleState startingState = new ModuleState(coords[1], coords[0], (PlayerDirection)facing, mazeNames[chosenMaze], maze, null);
+        path = FindPath(startingState, mainCoords[1, 1], mainCoords[1, 0]);
+        pathString = ConvertPathToString(path);
+        Debug.LogFormat("[Wind-Up Maze #{0}] One path to goal: {1}", moduleId, string.Join(", ", pathString.ToArray()));
+        StartCoroutine(Animate());
 	}
+
+	/// <summary>
+	/// Returns a maze as a 2D array
+	/// </summary>
+	/// <returns></returns>
+	private bool[,] GetMaze(int mazeIndex)
+	{
+		int dimensionLength = 4;
+		int mazeLength = dimensionLength * dimensionLength;
+        bool[,] maze = new bool[mazeLength, 4];
+
+		for(int cellIndex = 0; cellIndex < mazeLength; cellIndex++)
+		{
+            for (int wallIndex = 0; wallIndex < 4; wallIndex++)
+            {
+				maze[cellIndex, wallIndex] = Mazes[mazeIndex, cellIndex, wallIndex];
+            }
+		}
+
+		return maze;
+    }
 
 	IEnumerator GoFuckYourself() {
 		/*Piece of crap Modkit
@@ -200,10 +232,9 @@ public class WindUpMaze : MonoBehaviour {
 		setCoords();
 		shiftCoords();
 
-		coords[0] = mainCoords[0, 0];
+        coords[0] = mainCoords[0, 0];
 		coords[1] = mainCoords[0, 1];
-
-		tempCoords[0].text = mainCoords[0, 0] + ", " + mainCoords[0, 1];
+        tempCoords[0].text = mainCoords[0, 0] + ", " + mainCoords[0, 1];
 		tempCoords[1].text = mainCoords[1, 0] + ", " + mainCoords[1, 1];
 	}
 
@@ -225,7 +256,7 @@ public class WindUpMaze : MonoBehaviour {
 				if (hintGrid[j, i] == 0) { hintGrid[j, i] = UnityEngine.Random.Range(0, 2); }
 			}
 		}
-		Debug.LogFormat("[Wind-Up Maze #{0}] Coordinates start at top left going down right. Top right is x3 y0, Bottom left is x0 y3.", moduleId);
+        Debug.LogFormat("[Wind-Up Maze #{0}] Coordinates start at top left going down right. Top right is x3 y0, Bottom left is x0 y3.", moduleId);
 		for (int i = 0; i < 2; i++) {
 			Debug.LogFormat("[Wind-Up Maze #{0}] Mode {1} grid:", moduleId, i);
 			Debug.LogFormat("[Wind-Up Maze #{0}] {1} - - {2}", moduleId, hintGrid[i, 0], hintGrid[i, 1]);
@@ -473,11 +504,95 @@ public class WindUpMaze : MonoBehaviour {
 			if (!tpOverride) { Module.HandleStrike(); }
 		}
 	}
-	
-			// Twitch Plays Support
+
+	//Find the shortest path from one cell to another
+	private List<ModuleState> FindPath(ModuleState startingState, int goalRow, int goalColumn)
+	{
+		List<ModuleState> vistedStates = new List<ModuleState>() { startingState };
+        Queue<ModuleState> queue = new Queue<ModuleState>();
+        queue.Enqueue(startingState);
+
+		//continue while the goal has not been found
+		while (queue.Count > 0 && !vistedStates.Any(s => s.HasGoalCell(goalRow, goalColumn)))
+        {
+            ModuleState currentState = queue.Dequeue();
+
+            //get all the valid neighbors
+            List<ModuleState> currentStateNieghbors = currentState.GetAvaiableGameStatesNieghbors();
+
+            foreach (ModuleState neighbor in currentStateNieghbors)
+            {
+                //don't check states we already visted
+                if (vistedStates.Any(v => v.Equals(neighbor)))
+                {
+                    continue;
+                }
+
+                vistedStates.Add(neighbor);
+                queue.Enqueue(neighbor);
+            }
+        }
+
+        //find the shortest path
+        ModuleState endNode = vistedStates.FirstOrDefault(s => s.HasGoalCell(goalRow, goalColumn));
+
+        //a path to the goal cell could not be found
+        if (endNode == null)
+        {
+            return new List<ModuleState>();
+        }
+
+        List<ModuleState> path = new List<ModuleState>();
+        ModuleState current = endNode;
+
+        while (current != null)
+        {
+            //add it to list
+            path.Add(current);
+
+            //set new current state
+            current = current.ParentState;
+        }
+
+        path.Reverse();
+
+        return path;
+    }
+
+	/// <summary>
+	/// Converts a list of module states to a comprehensable set of moves to get to the goal
+	/// </summary>
+	/// <param name="path"></param>
+	/// <returns></returns>
+	private List<string> ConvertPathToString(List<ModuleState> path)
+	{ 
+		List<string> moves = new List<string>();
+
+		for (int i = 0; i < path.Count - 1; i++)
+		{
+			ModuleState start = path[i];
+			ModuleState end = path[i + 1];
+
+			//If the state cell is the same, then we must have turned the key
+			if (start.Row == end.Row && start.Col == end.Col)
+			{
+				string turnDirection = ModuleState.Modulo((int)start.PlayerDirection + 1, 4) == (int)end.PlayerDirection ? "RIGHT" : "LEFT";
+                moves.Add("TURN " + turnDirection);
+			}
+			
+			else
+			{
+                moves.Add("MOVE");
+            }
+		}
+
+        return moves;
+	}
+
+    // Twitch Plays Support
 
 #pragma warning disable 414
-	private readonly string TwitchHelpMessage = @"!{0} Grab -- Grab key (if applicable) || Check Start/Target -- Checks the light grid for start/target coordinates || Reset -- Resets your position || Move -- Moves you one space forward || Turn Forward/Left/Right -- Turns your position || Submit -- Submits your coords";
+    private readonly string TwitchHelpMessage = @"!{0} Grab -- Grab key (if applicable) || Check Start/Target -- Checks the light grid for start/target coordinates || Reset -- Resets your position || Move -- Moves you one space forward || Turn Forward/Left/Right -- Turns your position || Submit -- Submits your coords";
 #pragma warning restore 414
 
 	bool isValidPos(string n, int SET) {
@@ -605,15 +720,36 @@ public class WindUpMaze : MonoBehaviour {
 		}
 	}
 
-	void TwitchHandleForcedSolve() { //Autosolver
-		StartCoroutine(TPAutosolve());
-	}
-	
-	IEnumerator TPAutosolve () {
-		tpOverride = true;
-		while (!MasterKey.GlobalKeyHeld && HasKey == 0) { yield return new WaitForSeconds(0.1f); }
-		if (HasKey == 1) { TwitchToggleKey(0); }
-		
-		yield break;
-	}
+    IEnumerator TwitchHandleForcedSolve() { //Autosolver
+		//If the key is not in our hand or the the reset hole, get it
+        while (!MasterKey.GlobalKeyHeld && HasKey == 0)
+        {
+            yield return true;
+        }
+
+        //put it in the reset hole
+        if (HasKey == 0) 
+		{
+            TwitchToggleKey(0);
+        }
+
+        //reset
+        yield return ProcessTwitchCommand("RESET");
+
+
+        //perform each move in the solution
+        foreach (string move in pathString)
+        {
+            yield return ProcessTwitchCommand(move);
+        }	
+
+        //submit solution
+		yield return ProcessTwitchCommand("SUBMIT");
+
+		//wait until module is solved
+        while (!moduleSolved)
+        {
+            yield return null;
+        }
+    }
 }
