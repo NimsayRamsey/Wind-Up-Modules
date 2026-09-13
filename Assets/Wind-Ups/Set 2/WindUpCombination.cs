@@ -82,20 +82,12 @@ public class WindUpCombination : MonoBehaviour {
 
 	void Start () {
 		windID = MasterKey.ServeID(Bomb);
+		for (int i = 0; i < 6; i++) { TurnArrowsTransform[i].SetActive(false); }
 
-		StartCoroutine(GoFuckYourself());
 		StartCoroutine(CheckKey());
 		
 		InitSolution();
 		StartCoroutine(Animate());
-	}
-
-	IEnumerator GoFuckYourself() {
-		/*Piece of crap Modkit pt3
-			Delays the transform hiding so the module doesn't shit itself and die
-		*/
-		yield return new WaitForSeconds(0.01f);
-		for (int i = 0; i < 6; i++) { TurnArrowsTransform[i].SetActive(false); }
 	}
 
 	IEnumerator CheckKey () {
