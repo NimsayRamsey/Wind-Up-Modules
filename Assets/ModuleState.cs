@@ -9,7 +9,6 @@ public class ModuleState {
     private int dimensionLength = 4; // the length of the maze for width and height.
     public int Row { get; set; }
     public int Col { get; set; }
-
     public PlayerDirection PlayerDirection { get; set; } //the direction we are facing in the maze.
 
     public string MazeName { get; set; }

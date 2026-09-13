@@ -234,10 +234,6 @@ public class WindUpMaze : MonoBehaviour {
 
         coords[0] = mainCoords[0, 0];
 		coords[1] = mainCoords[0, 1];
-
-
-
-
         tempCoords[0].text = mainCoords[0, 0] + ", " + mainCoords[0, 1];
 		tempCoords[1].text = mainCoords[1, 0] + ", " + mainCoords[1, 1];
 	}
@@ -260,7 +256,6 @@ public class WindUpMaze : MonoBehaviour {
 				if (hintGrid[j, i] == 0) { hintGrid[j, i] = UnityEngine.Random.Range(0, 2); }
 			}
 		}
-
         Debug.LogFormat("[Wind-Up Maze #{0}] Coordinates start at top left going down right. Top right is x3 y0, Bottom left is x0 y3.", moduleId);
 		for (int i = 0; i < 2; i++) {
 			Debug.LogFormat("[Wind-Up Maze #{0}] Mode {1} grid:", moduleId, i);
