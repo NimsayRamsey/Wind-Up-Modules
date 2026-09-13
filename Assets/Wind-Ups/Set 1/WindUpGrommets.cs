@@ -108,9 +108,9 @@ public class WindUpGrommets : MonoBehaviour {
 		}
 
 		for (int i = 0; i < 4; i++) {
-			FrameForms[i*2].material = FrameMats[frameVals[i]];
-			FrameForms[i*2+1].material = FrameMats[frameVals[i]];
-			if (i == 3) { FrameForms[i*2+2].material = FrameMats[frameVals[4]]; }
+			FrameForms[i].material = FrameMats[frameVals[i]];
+			//FrameForms[i*2+1].material = FrameMats[frameVals[i]];
+			if (i == 3) { FrameForms[i+1].material = FrameMats[frameVals[4]]; FrameForms[i+2].material = FrameMats[frameVals[4]]; }
 		}
 		string[] dbMatLst = new string[] {"Copper", "Brass", "Steel"};
 		Debug.LogFormat("[Wind-Up Grommets #{0}] Materials in reading order:", moduleId);

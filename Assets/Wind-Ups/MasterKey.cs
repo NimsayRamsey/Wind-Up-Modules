@@ -8,6 +8,8 @@ public static class MasterKey {
 	public static bool GlobalKeyHeld = true;
 	public static int windIdCounter = 1;
 	public static string firstSerial = "";
+	private static bool spareOverride = false;
+	private static bool sparePlaced = false;
 
 	public static int ServeID (KMBombInfo Bomb) {
 		//Debug.Log(Bomb.GetSerialNumber());
@@ -17,8 +19,18 @@ public static class MasterKey {
 		return windIdCounter++;
 	}
 
+	public static void QueueSpare(int ID) {
+		if (ID != 0) { spareOverride = true; }
+	}
+
 	public static bool PlaceKey (int ID) {
+		if (spareOverride) { return false; }
 		if (ID+1 == windIdCounter) { GlobalKeyHeld = false; return true; }
+		return false;
+	}
+
+	public static bool PlaceSpare () {
+		if (!sparePlaced) { GlobalKeyHeld = false; sparePlaced = true; return true; }
 		return false;
 	}
 
@@ -26,6 +38,8 @@ public static class MasterKey {
 		GlobalKeyHeld = true;
 		windIdCounter = 1;
 		firstSerial = "";
+		spareOverride = false;
+		sparePlaced= false;
 	}
 
 	//-----------------------------------------------------//
